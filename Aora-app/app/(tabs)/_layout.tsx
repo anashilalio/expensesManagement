@@ -59,12 +59,12 @@ const TabsLayout = () => {
                 options={{
                     title: 'Home',
                     headerShown: false,
-                    // tabBarIcon: ({ color }) => (
-                    //     <TabIcon icon={Dashboard} color={color}/>
-                    // ),
-                    // tabBarLabel: ({ color, focused }) => (
-                    //     <TabLabel color={color} focused={focused} name="Home" />
-                    // )
+                    tabBarIcon: ({ color }) => (
+                        <TabIcon icon={Dashboard} color={color}/>
+                    ),
+                    tabBarLabel: ({ color, focused }) => (
+                        <TabLabel color={color} focused={focused} name="Home" />
+                    )
                 }}
             />
             <Tabs.Screen
@@ -72,12 +72,12 @@ const TabsLayout = () => {
                 options={{
                     title: 'Expenses',
                     headerShown: false,
-                    // tabBarIcon: ({ color }) => (
-                    //     <TabIcon icon={Expenses} color={color} />
-                    // ),
-                    // tabBarLabel: ({ color, focused }) => (
-                    //     <TabLabel color={color} focused={focused} name="Expenses" />
-                    // )
+                    tabBarIcon: ({ color }) => (
+                        <TabIcon icon={Expenses} color={color} />
+                    ),
+                    tabBarLabel: ({ color, focused }) => (
+                        <TabLabel color={color} focused={focused} name="Expenses" />
+                    )
                 }}
             />
             <Tabs.Screen
@@ -85,7 +85,7 @@ const TabsLayout = () => {
                 options={{
                     headerShown: false,
                     tabBarLabel: () => (null),
-                    tabBarIcon: ({ color }) => (
+                    tabBarIcon: () => (
                         <AddButton/>
                     )
                  }}
@@ -95,12 +95,12 @@ const TabsLayout = () => {
                 options={{
                     title: 'Budgets',
                     headerShown: false,
-                    // tabBarIcon: ({ color }) => (
-                    //     <TabIcon icon={Budgets} color={color} />
-                    // ),
-                    // tabBarLabel: ({ color, focused }) => (
-                    //     <TabLabel color={color} focused={focused} name="Budgets" />
-                    // )
+                    tabBarIcon: ({ color }) => (
+                        <TabIcon icon={Budgets} color={color} />
+                    ),
+                    tabBarLabel: ({ color, focused }) => (
+                        <TabLabel color={color} focused={focused} name="Budgets" />
+                    )
                 }}
             />
             <Tabs.Screen
@@ -108,12 +108,12 @@ const TabsLayout = () => {
                 options={{
                     title: 'Profile',
                     headerShown: false,
-                    // tabBarIcon: ({ color }) => (
-                    //     <TabIcon icon={Profile} color={color} />
-                    // ),
-                    // tabBarLabel: ({ color, focused }) => (
-                    //     <TabLabel color={color} focused={focused} name="Profile" />
-                    // )
+                    tabBarIcon: ({ color }) => (
+                        <TabIcon icon={Profile} color={color} />
+                    ),
+                    tabBarLabel: ({ color, focused }) => (
+                        <TabLabel color={color} focused={focused} name="Profile" />
+                    )
                 }}
             />
         </Tabs>

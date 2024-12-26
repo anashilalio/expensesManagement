@@ -62,6 +62,13 @@ export default function HomeScreen() {
           >
             <Text style={[styles.buttonTextLogIn, styles.buttonText]}>Login</Text>
           </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.button}
+            activeOpacity={0.6}
+            onPress={() => {router.push('/(tabs)/home')}}
+          >
+            <Text style={[styles.buttonTextLogIn, styles.buttonText]}>Home</Text>
+          </TouchableOpacity>
         </View>
 
       </View>
