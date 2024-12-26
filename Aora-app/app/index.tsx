@@ -58,7 +58,7 @@ export default function HomeScreen() {
           <TouchableOpacity
             style={styles.button}
             activeOpacity={0.6}
-            onPress={() => {router.push('/(auth)/sign-in')}}
+            onPress={() => {router.push('/(auth)/login')}}
           >
             <Text style={[styles.buttonTextLogIn, styles.buttonText]}>Login</Text>
           </TouchableOpacity>
