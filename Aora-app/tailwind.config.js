@@ -10,14 +10,17 @@ module.exports = {
       colors: {
         title: "#17202A",
         subtitle: "#808B96",
-        primary: "#7F3DFF",
+        buttPrimary: "#7F3DFF",
+        buttSecondary: "#EEE5FF",        
         text:{
-          primary: "#FCFCFC"
+          primary: "#FCFCFC",
+          dark: "#212325",
+          gray: "#91919f"
         },
-        secondary: "#EEE5FF",
+        
         borderInactive: "#F1F1FA",
         borderActive: "#7F3DFF",
-
+        violet: "#7F3DFF",
         tomato: "#ee6856"
       },
       fontFamily: {

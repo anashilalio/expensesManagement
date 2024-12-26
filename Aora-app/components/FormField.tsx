@@ -7,7 +7,7 @@ interface FormFieldPropos{
     title: string,
     value: string,
     handleChangedText: (e: any) => void,
-    styles: string,
+    styles?: string,
     keyboardType?: string,
     placeholder: string,
 }
@@ -20,17 +20,14 @@ const FormField: React.FC<FormFieldPropos> = ({title, value, handleChangedText, 
     
     return (
         <View className={`space-y-2 ${styles}`}>
-            <Text className='text-base text-gray-300 font-pmedium'>
-                {title}
-            </Text>
             
-            <View className={`w-full h-16 px-4 border-2 rounded-xl
+            <View className={`w-full h-20 px-4 border-2 rounded-2xl
                  flex-row items-center ${isFocused ? 'border-borderActive' : 'border-borderInactive'}`}>
                 <TextInput
-                    className='flex-1 items-center text-white font-psemibold text-base'
+                    className='flex-1 text-text-dark font-psemibold text-base'
                     value={value}
                     placeholder={placeholder}
-                    placeholderTextColor="#7b7b8b"
+                    placeholderTextColor="#91919f"
                     onChangeText={handleChangedText}
                     onFocus={() => setIsFocused(true)}
                     onBlur={() => setIsFocused(false)}
