@@ -5,6 +5,7 @@ import { useContext, useEffect } from "react";
 import { PieChartContext } from "@/app/(tabs)/home";
 import { useSharedValue, withTiming } from "react-native-reanimated";
 import { formatAmount } from "../utils/format"
+import { categoriesColors } from "@/utils/categoriesColors";
 
 const LowPartExpenses = () => {
 
@@ -28,9 +29,9 @@ const LowPartExpenses = () => {
     const circumeference = 2 * Math.PI * r
 
     return (
-        <View className="flex-row items-center gap-12">
+        <View className="flex-row items-center gap-8">
 
-            <Svg width={width} height={height} viewBox={`0 0 ${width} ${height}`}>
+            <Svg className="flex-1" width={width} height={height} viewBox={`0 0 ${width} ${height}`}>
                 {categoryData.map((category, index) => {
 
                     const percentage = category.amount / totalExpenses;
@@ -40,12 +41,12 @@ const LowPartExpenses = () => {
 
                     return (
                         <PieChartSegment
-                            key={category.index}
+                            key={index}
                             cx={cx}
                             cy={cy}
                             r={r}
                             strokeWidth={strokeWidth}
-                            stroke={category.color}
+                            stroke={categoriesColors[category.category]}
                             circumeference={circumeference}
                             percentage={percentage}
                             originX={cx}
@@ -57,12 +58,12 @@ const LowPartExpenses = () => {
                 })}
             </Svg>
 
-            <View className="gap-5">
+            <View className="flex-1 gap-5">
                 {categoryData.map((category, index) => {
                     return (
                         <View className="" key={index}>
                             <View className="flex-row gap-2 items-center">
-                                <View className='w-3 h-6 rounded-md' style={{ backgroundColor: category.color }}></View>
+                                <View className='w-3 h-6 rounded-md' style={{ backgroundColor: categoriesColors[category.category] }}></View>
                                 <Text className="text-black font-psemibold text-base">
                                     {category.category}
                                 </Text>

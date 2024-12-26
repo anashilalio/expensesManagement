@@ -41,6 +41,7 @@ const TabLabel: React.FC<TabLabelProps> = ({ name, color, focused }) => {
         </Text>
     )
 }
+
 const TabsLayout = () => {
     return (
         <Tabs

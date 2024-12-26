@@ -34,7 +34,7 @@ const TopPartExpenses = () => {
                 </Text>
             </View>
 
-            <Text className="font-psemibold text-xl text-tomato">
+            <Text className="font-psemibold text-xl text-tomato-primary">
                 {formatAmount(totalExpenses, currency)}
             </Text>
 

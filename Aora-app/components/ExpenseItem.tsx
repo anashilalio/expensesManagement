@@ -26,7 +26,7 @@ const ExpenseItem: React.FC<ExpenseItemProps> = ({ name, category, amount }) => 
                 </Text>
             </View>
             <View>
-                <Text className="font-psemibold text-lg text-tomato">
+                <Text className="font-psemibold text-lg text-tomato-primary">
                     {formatAmount(amount, currency)}
                 </Text>
             </View>
