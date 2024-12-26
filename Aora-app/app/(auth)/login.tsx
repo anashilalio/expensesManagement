@@ -1,10 +1,11 @@
 import CustomButton from '@/components/Buttons/CustomButton'
 import FormField from '@/components/FormField'
-import { useState } from 'react'
-import { ScrollView, Text, View } from 'react-native'
+import { useState, useEffect } from 'react'
+import { Alert, ScrollView, Text, View } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { Link, useNavigation } from "expo-router"
 import { useHeaderHeight } from '@react-navigation/elements'
+import axios from 'axios'
 
 const SignIn = () => {
 
@@ -12,10 +13,22 @@ const SignIn = () => {
     email: '',
     password: ''
   })
+  const [isFetching, setIsFetching] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false)
   const headerHeight = useHeaderHeight();
   const submit = () => { }
-
+  const fetchHelloMessage = async () => {
+    setIsFetching(true);
+    try {
+      const response = await axios.get('http://100.103.97.26:3000');
+      Alert.alert('Response', response.data); // Show the server response
+    } catch (error) {
+      console.error('Error fetching hello message:', error);
+      Alert.alert('Error', 'Failed to fetch the message.');
+    } finally {
+      setIsFetching(false);
+    }
+  };
   return (
     <SafeAreaView className='bg-white h-full'>
       <ScrollView contentContainerStyle={{ justifyContent: 'center', flexGrow: 1 }}>
