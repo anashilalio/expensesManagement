@@ -17,11 +17,32 @@ module.exports = {
           dark: "#212325",
           gray: "#91919f"
         },
-        
+        category:{
+          transport: {
+            primary: "#1982c4",
+            secondary: "#e5f3fc"
+          },
+          food: {
+            primary: "#8ac926",
+            secondary: "#f4fbe8"
+          },
+          shopping: {
+            primary: "#ff595e",
+            secondary: "#ffeeef"
+          },
+          entertainment: {
+            primary: "#6a4c93",
+            secondary: "#f0ecf5"
+          }
+        },
         borderInactive: "#F1F1FA",
         borderActive: "#7F3DFF",
         violet: "#7F3DFF",
-        tomato: "#ee6856"
+        tomato: {
+          primary: "#ee6856",
+          secondary: "#fdf0ee"
+        },
+        lightGray: "#FCFCFC",
       },
       fontFamily: {
         pthin: ["Poppins-Thin", "sans-serif"],
