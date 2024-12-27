@@ -1,13 +1,12 @@
 import CustomButton from '@/components/Buttons/CustomButton'
 import FormField from '@/components/FormField'
-import { useState } from 'react'
+import React, { useState } from 'react'
 import { ScrollView, Text, View } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { Link } from "expo-router"
 import Google from '../../assets/icons/google.png'
-import CheckBox from 'expo-checkbox'
 import { useHeaderHeight } from '@react-navigation/elements'
-
+import { Checkbox } from 'expo-checkbox'
 const SignUp = () => {
 
   const [info, setInfo] = useState({
@@ -54,7 +53,7 @@ const SignUp = () => {
           </View>
 
           <View className='flex-row gap-2 items-center mt-5'>
-            <CheckBox
+            <Checkbox
               value={agreeingToTerms}
               onValueChange={setAgreeingToTerms}
               color={agreeingToTerms ? '#7F3DFF' : undefined}

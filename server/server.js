@@ -1,9 +1,9 @@
 const express = require('express');
-const cors = require('cors'); // Import CORS middleware
+const cors = require('cors'); 
 const mongoose = require("mongoose");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
-// qdd bycrpt js
+
 const app = express();
 const PrivateKey="shfhjsgefVGUGUY_è-_-/ML";
 // Middleware
@@ -27,16 +27,33 @@ app.listen(PORT, () => {
 });
 
 
-// ------------------- user -------------------- //
 const Schema = mongoose.Schema;
 const userSchema = new Schema({
-    FullName: { type: String, required: true },
-    email: { type: String, required: true },
-    password: { type: String, required: true },
-    resetPasswordToken: { type: String },
-    resetPasswordExpires: { type: Date }
+    FullName: { category: String, required: true },
+    email: { category: String, required: true },
+    password: { category: String, required: true },
+    resetPasswordToken: { category: String },
+    resetPasswordExpires: { category: Date }
+  });
+
+  // Define the expense schema
+  const expenseSchema = new Schema({
+    category: { category: String, required: true },
+    amount: { category: String, required: true },
+    name : {category : String  , required: false},
+    date: { category: Date, required: true }
+  });
+  const budgetSchema = new Schema({
+    category: { category: String, required: true },
+    amount: { category: String, required: true },
+    name : {category : String  , required: false}
   });
   
+  // Create the Expense model
+  const Expense = mongoose.model('Expense', expenseSchema);
+  const Budget = mongoose.model('Budget', budgetSchema);
+
+
 
 
   // Create a model from the schema
@@ -46,17 +63,14 @@ const userSchema = new Schema({
   app.post('/api/register', async (req, res) => {
     try {
       const { FullName, email, password } = req.body;
-      // Hash the password before saving
       const hashedPassword = await bcrypt.hash(password, 10);
   
-      // Create a new document with the request body data
       const newUser = new User({ 
         FullName,
         email,
         password: hashedPassword,
       });
   
-      // Save the new user to the database
       await newUser.save();
   
       res.status(201).json({ message: 'Registration successful!' });
@@ -65,19 +79,16 @@ const userSchema = new Schema({
       res.status(500).json({ message: 'Internal server error' });
     }
   });
-  // Define the login route
   app.post('/api/login', async (req, res) => {
     try {
       const { email, password } = req.body;
   
-      // Find the user by email
       const user = await User.findOne({ email });
   
       if (!user) {
         return res.status(400).json({ message: 'Invalid email or password' });
       }
   
-      // Compare the provided password with the stored hashed password
       const isMatch = await bcrypt.compare(password, user.password);
   
       if (!isMatch) {
@@ -91,3 +102,40 @@ const userSchema = new Schema({
       res.status(500).json({ message: 'Internal server error' });
     }
   });
+  app.post('/api/addExpense', async (req, res) => {
+    try {
+      const { category , amount , name, date } = req.body;
+  
+      // Create a new expense instance
+      const newExpense = new Expense({
+        category,
+        amount,
+        name ,
+        date: new Date(date) 
+      });
+      await newExpense.save();
+  
+      res.status(201).json({ message: 'Expense added successfully!' });
+    } catch (error) {
+      console.error('Error adding expense:', error);
+      res.status(500).json({ message: 'Internal server error' });
+    }
+  });
+  app.post('/api/addBudget', async (req, res) => {
+    try {
+      const { category , amount , name } = req.body;
+  
+      const newBudget = new Budget({
+        category,
+        amount,
+        name 
+      });
+  
+      await newBudget.save();
+  
+      res.status(201).json({ message: 'Budget added successfully!' });
+    } catch (error) {
+      console.error('Error adding budget:', error);
+      res.status(500).json({ message: 'Internal server error' });
+    }
+  })
