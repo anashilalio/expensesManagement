@@ -1,6 +1,6 @@
 import CustomButton from '@/components/Buttons/CustomButton'
 import FormField from '@/components/FormField'
-import React, { useEffect, useState } from 'react'
+import React, { createContext, useEffect, useState } from 'react'
 import { ScrollView, Text, View } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { Link } from "expo-router"
@@ -8,12 +8,26 @@ import Google from '../../assets/icons/google.png'
 import { useHeaderHeight } from '@react-navigation/elements'
 import { Checkbox } from 'expo-checkbox'
 import axios from 'axios'
+import { createUser } from '@/api/user'
+
+interface UserInfoType{
+  username: string,
+  email: string,
+  password: string
+}
+
+const UserInfoContext = createContext<UserInfoType>({
+  username: '',
+  email: '',
+  password: ''
+})
+
 const SignUp = () => {
 
-  const [info, setInfo] = useState({
+  const [userInfo, setUserInfo] = useState<UserInfoType>({
     username:'',
     email: '',
-    pwd: ''
+    password: ''
   })
 
   const [isSubmitting, setIsSubmitting] = useState(false)
@@ -21,12 +35,9 @@ const SignUp = () => {
   const [agreeingToTerms, setAgreeingToTerms] = useState(false)
 
   const headerHeight = useHeaderHeight();
-  useEffect(()=>{
-    console.log(info);
-  })
-  const submit = async() => {
-    const response = await axios.post("http://192.168.41.180:3000/api/register" , info)
-    console.log(response.data)
+
+  const signUp = () => {
+    createUser(userInfo.username, userInfo.email, userInfo.password)
   }
 
   return (
@@ -38,23 +49,23 @@ const SignUp = () => {
             <FormField
               title="Username"
               placeholder='Username'
-              value={info.username}
-              handleChangedText={(input: any) => setInfo({ ...info, username: input })}
+              value={userInfo.username}
+              handleChangedText={(input: any) => setUserInfo({ ...userInfo, username: input })}
             />
 
             <FormField
               title="E-mail"
               placeholder='E-mail'
-              value={info.email}
-              handleChangedText={(input: any) => setInfo({ ...info, email: input })}
+              value={userInfo.email}
+              handleChangedText={(input: any) => setUserInfo({ ...userInfo, email: input })}
               keyboardType="email-address"
             />
 
             <FormField
               title="Password"
               placeholder='Password'
-              value={info.pwd}
-              handleChangedText={(input: any) => setInfo({ ...info, pwd: input })}
+              value={userInfo.password}
+              handleChangedText={(input: any) => setUserInfo({ ...userInfo, password: input })}
             />
           </View>
 
@@ -82,7 +93,7 @@ const SignUp = () => {
               title='Sign Up'
               containerStyles='bg-buttPrimary justify-center'
               textStyles='text-text-primary text-center'
-              handlePress={submit}
+              handlePress={() => signUp()}
               isLoading={isSubmitting}
             />
 
@@ -95,7 +106,7 @@ const SignUp = () => {
               containerStyles='bg-white flex-row items-center justify-center gap-3 border-2 border-borderInactive'
               textStyles='text-text-dark'
               icon={Google}
-              handlePress={submit}
+              handlePress={() => signUp()}
               isLoading={isSubmitting}
             />
           </View>
