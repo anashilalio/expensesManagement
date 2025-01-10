@@ -29,34 +29,49 @@ app.listen(PORT, () => {
 
 const Schema = mongoose.Schema;
 const userSchema = new Schema({
-    FullName: { category: String, required: true },
-    email: { category: String, required: true },
-    password: { category: String, required: true },
-    resetPasswordToken: { category: String },
-    resetPasswordExpires: { category: Date }
+    FullName: { type: String, required: true },
+    email: { type: String, required: true },
+    password: { type: String, required: true },
+    resetPasswordToken: { type: String },
+    resetPasswordExpires: { type: Date }
   });
 
-  // Define the expense schema
   const expenseSchema = new Schema({
-    category: { category: String, required: true },
-    amount: { category: String, required: true },
-    name : {category : String  , required: false},
-    date: { category: Date, required: true }
+    category: { type: String, required: true },
+    amount: { type: String, required: true },
+    name : {type : String  , required: false},
+    date: { type: Date, required: true }
   });
   const budgetSchema = new Schema({
-    category: { category: String, required: true },
-    amount: { category: String, required: true },
-    name : {category : String  , required: false}
+    category: { type: String, required: true },
+    amount: { type: String, required: true },
+    name : {type : String  , required: false}
   });
-  
-  // Create the Expense model
+
+const communitySchema = new mongoose.Schema({
+  name: { type: String, required: true },
+  description: { type: String, required: true },
+  members: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],  // Array of User references
+  createdAt: { type: Date, default: Date.now }
+});
+const notificationSchema = new mongoose.Schema({
+  sender: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },  // Reference to the sender user
+  recipient: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true }, // Reference to the recipient user
+  message: { type: String, required: true },  // Notification message content
+  type: { 
+    type: String, 
+    enum: ['info', 'warning', 'error'], // Possible types of notifications
+    required: true 
+  },
+  read: { type: Boolean, default: false },  // Indicates if the notification is read or not
+  createdAt: { type: Date, default: Date.now },  // Timestamp of when the notification was created
+});
+
+const Notification = mongoose.model('Notification', notificationSchema);
+const Community = mongoose.model('Community', communitySchema);
+
   const Expense = mongoose.model('Expense', expenseSchema);
   const Budget = mongoose.model('Budget', budgetSchema);
-
-
-
-
-  // Create a model from the schema
   const User = mongoose.model('User', userSchema);
   
   // Define the registration route
@@ -139,3 +154,62 @@ const userSchema = new Schema({
       res.status(500).json({ message: 'Internal server error' });
     }
   })
+  app.post('/api/addCommunity', async (req, res) => {
+    try {
+      const { name, description, members } = req.body;
+  
+      // Create a new Community instance
+      const newCommunity = new Community({
+        name,
+        description,
+        members  // Pass in member IDs or references
+      });
+  
+      await newCommunity.save();
+  
+      res.status(201).json({ message: 'Community added successfully!' });
+    } catch (error) {
+      console.error('Error adding community:', error);
+      res.status(500).json({ message: 'Internal server error' });
+    }
+  });
+  app.get('/api/communities', async (req, res) => {
+    try {
+      const communities = await Community.find().populate('members');
+      res.status(200).json(communities);
+    } catch (error) {
+      console.error('Error fetching communities:', error);
+      res.status(500).json({ message: 'Internal server error' });
+    }
+  });
+  app.post('/api/sendNotification', async (req, res) => {
+    try {
+      const { sender, recipient, message, type } = req.body;
+  
+      const newNotification = new Notification({
+        sender,
+        recipient,
+        message,
+        type
+      });
+  
+      await newNotification.save();
+  
+      res.status(201).json({ message: 'Notification sent successfully!' });
+    } catch (error) {
+      console.error('Error sending notification:', error);
+      res.status(500).json({ message: 'Internal server error' });
+    }
+  });
+  app.get('/api/notifications/:userId', async (req, res) => {
+    try {
+      const userId = req.params.userId;
+      const notifications = await Notification.find({ recipient: userId }).populate('sender').sort({ createdAt: -1 });
+  
+      res.status(200).json(notifications);
+    } catch (error) {
+      console.error('Error fetching notifications:', error);
+      res.status(500).json({ message: 'Internal server error' });
+    }
+  });
+    

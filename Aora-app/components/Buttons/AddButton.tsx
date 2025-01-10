@@ -25,8 +25,8 @@ const AddButton = () => {
             }}
         >
             <Svg viewBox={`0 0 ${width} ${height}`} width={width} height={height}>
-                <Circle cx={cx} cy={cy} r={rLarge} fill="#9DB2CE"/>
-                <Circle cx={cx} cy={cy} r={rSmall} fill="#142850"/>
+                <Circle cx={cx} cy={cy} r={rLarge} fill="#D8B4FE"/>
+                <Circle cx={cx} cy={cy} r={rSmall} fill="#7C3AED"/>
                 <Rect x={plusXHorizantal} y={plusYHorizantal} width={plusBarLenght} height="1.5" rx="1" fill="white"/>
                 <Rect x={plusXVertical} y={plusYVertical} width="1.5" height={plusBarLenght} rx="1" fill="white"/>
             </Svg>

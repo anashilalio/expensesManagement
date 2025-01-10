@@ -1,4 +1,4 @@
-import { ScrollView, Text, View } from 'react-native'
+import { ScrollView, Text, View , TouchableOpacity } from 'react-native'
 import React, { createContext, useEffect, useState } from 'react'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import TopPartExpenses from '@/components/TopPartExpenses'
@@ -6,7 +6,8 @@ import LowPartExpenses from '@/components/LowPartExpenses'
 import RecentExpenses from "../../components/Home/RecentExpenses"
 import Header from "../../components/Home/header"
 import Financials from '@/components/Home/Financials'
-
+import Ionicons from 'react-native-vector-icons/Ionicons';
+import FontAwesome6 from '@expo/vector-icons/FontAwesome6';
 
 interface categoryType {
   category: string,
@@ -55,13 +56,73 @@ const Home = () => {
     }
     setTotalExpenses(total)
   }, [categoryData])
+ const [showMenu, setShowMenu] = useState(false);
+  const [currentMonthIndex, setCurrentMonthIndex] = useState(new Date().getMonth());
 
+  const months = [
+    'January', 'February', 'March', 'April', 'May', 'June', 'July',
+    'August', 'September', 'October', 'November', 'December',
+  ];
+
+  const handleNextMonth = () => {
+    setCurrentMonthIndex((prev) => (prev + 1) % 12);
+  };
+
+  const handlePreviousMonth = () => {
+    setCurrentMonthIndex((prev) => (prev - 1 + 12) % 12);
+  };
   return (
     <SafeAreaView className='h-full w-full bg-white '>
       <ScrollView>
+      {showMenu && (
+        <View className="absolute top-0 left-0 h-full w-full bg-white z-50 pt-4 px-8">
+        <TouchableOpacity className='z-51' onPress={() => setShowMenu((prev) => !prev)}>
+          <Ionicons name="menu" className='z-51 text-black'  size={24} color="black" />
+        </TouchableOpacity>
+        <View className='flex flex-col  h-full'>
+          <View className='flex flex-col  h-2/4 justify-center'>
+          <TouchableOpacity className="p-4  border-black">
+            <Text className="text-black text-xl">Profile</Text>
+          </TouchableOpacity>
+          <TouchableOpacity className="p-4  border-black">
+            <Text className="text-black text-xl">Community</Text>
+          </TouchableOpacity>
+          <TouchableOpacity className="p-4  border-black">
+            <Text className="text-black text-xl">Settings</Text>
+          </TouchableOpacity>
+          </View>
+          <TouchableOpacity className="p-4  border-gray">
+            <Text className="text-black text-xl">Sign Out</Text>
+          </TouchableOpacity>
+        </View>
+
+        </View>
+      )}
         <View className='mx-6'>
 
-          <Header />
+        <View>
+      <View className="flex-row justify-between items-center mt-4 px-4">
+        <TouchableOpacity className='z-51' onPress={() => setShowMenu((prev) => !prev)}>
+          <Ionicons name="menu" className='z-51'  size={24} color="black" />
+        </TouchableOpacity>
+
+        <View className="flex-row items-center">
+          <TouchableOpacity onPress={handlePreviousMonth}>
+            <FontAwesome6 name="chevron-left" size={18} color="black" />
+          </TouchableOpacity>
+          <Text className="font-semibold mx-2">{months[currentMonthIndex]}</Text>
+          <TouchableOpacity onPress={handleNextMonth}>
+            <FontAwesome6 name="chevron-right" size={18} color="black" />
+          </TouchableOpacity>
+        </View>
+
+        <TouchableOpacity>
+          <Ionicons name="notifications" size={24} color="black" />
+        </TouchableOpacity>
+      </View>
+
+      
+    </View>
 
           <View className="flex-col justify-center align-center w-full mt-6">
             <Text className=' text-sm font-pregular text-center text-gray-600 '>

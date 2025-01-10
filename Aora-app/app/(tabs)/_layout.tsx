@@ -1,5 +1,5 @@
-import { Image, StyleSheet, Text, View } from 'react-native'
-import React from 'react'
+import { Image, Text, TouchableOpacity, View } from 'react-native'
+import React, { useState } from 'react'
 import { Tabs } from 'expo-router'
 import Dashboard from '../../assets/icons/home.png'
 import Budgets from "../../assets/icons/budgets.png"
@@ -43,12 +43,13 @@ const TabLabel: React.FC<TabLabelProps> = ({ name, color, focused }) => {
 }
 
 const TabsLayout = () => {
+    
     return (
         <Tabs
             screenOptions={{
                 tabBarShowLabel: true,
-                tabBarActiveTintColor: "#142850",
-                tabBarInactiveTintColor: "#9DB2CE",
+                tabBarActiveTintColor: "#7C3AED",
+                tabBarInactiveTintColor: "#D8B4FE",
                 tabBarStyle: {
                     height: 70,
                     paddingTop: 6
@@ -85,13 +86,16 @@ const TabsLayout = () => {
                 name="add"
                 options={{
                     headerShown: false,
-                    tabBarLabel: () => (null),
+                    tabBarLabel: () => null,
                     tabBarIcon: () => (
-                        <AddButton/>
+                        <View className="">
+                            
+                                <AddButton />
+                        </View>
                     )
-                 }}
-             />
-             <Tabs.Screen
+                }}
+            />
+            <Tabs.Screen
                 name="budgets"
                 options={{
                     title: 'Budgets',

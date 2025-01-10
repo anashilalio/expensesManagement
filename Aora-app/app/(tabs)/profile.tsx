@@ -9,7 +9,7 @@ const Profile = () => {
   return (
     <SafeAreaView>
       <ScrollView>
-        <View className='bg-white flex-col gap-6 px-8 pt-8'>
+        <View className=' flex-col gap-6 px-8 pt-8'>
 
           <View className='flex-col items-center gap-3'>
             <Image source={User} className='rounded-full w-28 h-28' resizeMode='contain'/>
@@ -18,6 +18,7 @@ const Profile = () => {
           </View>
 
           <View className='flex-col'>
+            
             <Setting
               title='Edit profile'
               details='Change profile image, username, password'

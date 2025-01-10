@@ -2,8 +2,10 @@ import {ScrollView, Text, View } from 'react-native'
 import React, { useState } from 'react'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import ExpenseItem from '@/components/ExpenseItem'
-import { MdFilterList } from "react-icons/md";
-import { IoCalendarClearSharp } from "react-icons/io5";
+import Icon from 'react-native-vector-icons/MaterialIcons';
+import Icons from 'react-native-vector-icons/Ionicons';
+
+
 
 interface ExpenseType{
   name?:string,
@@ -30,9 +32,13 @@ const Expenses = () => {
   return (
     <SafeAreaView className='h-full w-full bg-white'>
       <ScrollView className='px-6 pt-6'>
+        <View className='flex flex-row justify-between px-2 mt-4'>
+      <Icon name="filter-list" size={24} color="#000" />
+      <Icons name="calendar-clear-sharp" size={24} color="#000" />
+
+        </View>
+
         <View className="flex-row justify-between py-4">
-        <IoCalendarClearSharp className='size-8'/>
-        <MdFilterList className='size-8'/>
         </View>
         <View className='gap-2'>
           {expensesData.map((expense, index) => {

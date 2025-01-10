@@ -1,12 +1,13 @@
 import CustomButton from '@/components/Buttons/CustomButton'
 import FormField from '@/components/FormField'
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { ScrollView, Text, View } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { Link } from "expo-router"
 import Google from '../../assets/icons/google.png'
 import { useHeaderHeight } from '@react-navigation/elements'
 import { Checkbox } from 'expo-checkbox'
+import axios from 'axios'
 const SignUp = () => {
 
   const [info, setInfo] = useState({
@@ -20,8 +21,13 @@ const SignUp = () => {
   const [agreeingToTerms, setAgreeingToTerms] = useState(false)
 
   const headerHeight = useHeaderHeight();
-
-  const submit = () => {}
+  useEffect(()=>{
+    console.log(info);
+  })
+  const submit = async() => {
+    const response = await axios.post("http://192.168.41.180:3000/api/register" , info)
+    console.log(response.data)
+  }
 
   return (
     <SafeAreaView className='bg-white h-full'>
