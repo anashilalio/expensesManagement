@@ -10,9 +10,10 @@ interface CustomButtonProps{
     isLoading?: boolean;
 }
 const CustomButton: React.FC<CustomButtonProps> = ({icon, title, handlePress, containerStyles, textStyles, isLoading}) => {
+
   return (
     <TouchableOpacity
-        onPress={handlePress}
+        onPress={() => handlePress()}
         activeOpacity={0.6}
         className={`rounded-2xl min-h-[64px]
           ${containerStyles} ${isLoading ? 'opacity-50': ''}`}
