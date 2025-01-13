@@ -1,31 +1,28 @@
-import { response, Router } from 'express'
-import {User} from '../schemas/user.js'
-import { UserValidationSchema } from '../utils/validationSchemas.mjs'
-import { checkSchema, matchedData, validationResult } from 'express-validator'
+import { Router } from 'express'
+import { Expense } from '../schemas/expense.js'
+import { Budget } from '../schemas/budget.js'
+import { Category } from '../schemas/category.js'
 
 const router = Router()
 
-router.post(
-    "/api/addUser",
-    checkSchema(UserValidationSchema),
+router.get(
+    "/api/user/getData",
     async (request, response) => {
-        
-        const result = validationResult(request)
-        
-        if(!result.isEmpty()){
-            return response.status(400).send({ errors: result.array()})
-        }
-        const data = matchedData(request)
-
-        const newUser = new User(data)
-
-        try {
-            const savedUser = await newUser.save()
-            return response.status(201).send()
-        } catch (error) {
-            console.dir(error)
+        if (!request.session.passport.user) {
             return response.sendStatus(400)
         }
+
+        const userId = request.session.passport.user
+
+        const expenses = await Expense.find({ userId: userId })
+        const categories = await Category.find({ userId: { $in: [userId, null]} })
+        const budgets = await Budget.find({ userId: userId })
+        const data = JSON.stringify({
+            categories: categories,
+            budgets: budgets,
+            expenses: expenses
+        })
+        return response.status(200).send(data)
     }
 )
 

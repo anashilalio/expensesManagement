@@ -5,17 +5,17 @@ import { formatAmount, formatDate } from "@/utils/format"
 import { categoryIcons } from "@/utils/IconMapping"
 
 interface ExpenseProps {
-    name?: string,
+    description?: string,
     category: string,
     amount: number,
-    date: Date
+    date: string
 }
 
-const Expense: React.FC<ExpenseProps> = ({ name, category, amount, date }) => {
+const Expense: React.FC<ExpenseProps> = ({ description, category, amount, date }) => {
 
-    const { currency, totalExpenses } = useContext(CurrencyContext)
+    const { currency } = useContext(CurrencyContext)
 
-    const expenseName = name || category
+    const expenseDescription = description || category
     const iconSize = 30
     const IconComponent = categoryIcons[category] || null;
 
@@ -28,7 +28,7 @@ const Expense: React.FC<ExpenseProps> = ({ name, category, amount, date }) => {
                         {category}
                     </Text>
                     <Text className="font-plight text-sm text-subtitle">
-                        {expenseName}
+                        {expenseDescription}
                     </Text>
                 </View>
                 <View className="flex-col gap-1">

@@ -1,62 +1,30 @@
-import { ScrollView, Text, View , TouchableOpacity } from 'react-native'
+import { ScrollView, Text, View, TouchableOpacity } from 'react-native'
 import React, { createContext, useEffect, useState } from 'react'
 import { SafeAreaView } from 'react-native-safe-area-context'
-import TopPartExpenses from '@/components/TopPartExpenses'
-import LowPartExpenses from '@/components/LowPartExpenses'
+import TopPartExpenses from '@/components/Home/TopPartExpenses'
+import LowPartExpenses from '@/components/Home/LowPartExpenses'
 import RecentExpenses from "../../components/Home/RecentExpenses"
 import Header from "../../components/Home/header"
 import Financials from '@/components/Home/Financials'
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import FontAwesome6 from '@expo/vector-icons/FontAwesome6';
-
-interface categoryType {
-  category: string,
-  amount: number
-}
+import { useAuth } from '@/components/AuthContext'
 
 interface CurrencyContextType {
-  currency: string,
-  totalExpenses: number
-}
-
-interface PieChartContextType {
-  categoryData: categoryType[],
-  currency: string,
-  totalExpenses: number
+  currency: string
 }
 
 export const CurrencyContext = createContext<CurrencyContextType>({
-  currency: '',
-  totalExpenses: 0
-})
-
-export const PieChartContext = createContext<PieChartContextType>({
-  categoryData: [],
-  currency: '',
-  totalExpenses: 0
+  currency: ''
 })
 
 const Home = () => {
 
-  const [categoryData, setcategoryData] = useState<categoryType[]>([
-    { category: "Transport", amount: 2700},
-    { category: "Food", amount: 1500},
-    { category: "Entertainment", amount: 600},
-    { category: "Shopping", amount: 3500}
-  ])
-
-  const [totalExpenses, setTotalExpenses] = useState(0)
+  const { user, setUser } = useAuth()
 
   const [currency, setcurrency] = useState("dollar")
 
-  useEffect(() => {
-    let total = 0
-    for (const expense of categoryData) {
-      total += expense.amount
-    }
-    setTotalExpenses(total)
-  }, [categoryData])
- const [showMenu, setShowMenu] = useState(false);
+  const [showMenu, setShowMenu] = useState(false);
   const [currentMonthIndex, setCurrentMonthIndex] = useState(new Date().getMonth());
 
   const months = [
@@ -74,55 +42,54 @@ const Home = () => {
   return (
     <SafeAreaView className='h-full w-full bg-white '>
       <ScrollView>
-      {showMenu && (
-        <View className="absolute top-0 left-0 h-full w-full bg-white z-50 pt-4 px-8">
-        <TouchableOpacity className='z-51' onPress={() => setShowMenu((prev) => !prev)}>
-          <Ionicons name="menu" className='z-51 text-black'  size={24} color="black" />
-        </TouchableOpacity>
-        <View className='flex flex-col  h-full'>
-          <View className='flex flex-col  h-2/4 justify-center'>
-          <TouchableOpacity className="p-4  border-black">
-            <Text className="text-black text-xl">Profile</Text>
-          </TouchableOpacity>
-          <TouchableOpacity className="p-4  border-black">
-            <Text className="text-black text-xl">Community</Text>
-          </TouchableOpacity>
-          <TouchableOpacity className="p-4  border-black">
-            <Text className="text-black text-xl">Settings</Text>
-          </TouchableOpacity>
-          </View>
-          <TouchableOpacity className="p-4  border-gray">
-            <Text className="text-black text-xl">Sign Out</Text>
-          </TouchableOpacity>
-        </View>
 
-        </View>
-      )}
+        {showMenu && (
+          <View className="absolute top-0 left-0 h-full w-full bg-white z-50 pt-4 px-8">
+            <TouchableOpacity className='z-51' onPress={() => setShowMenu((prev) => !prev)}>
+              <Ionicons name="menu" className='z-51 text-black' size={24} color="black" />
+            </TouchableOpacity>
+            <View className='flex flex-col  h-full'>
+              <View className='flex flex-col  h-2/4 justify-center'>
+                <TouchableOpacity className="p-4  border-black">
+                  <Text className="text-black text-xl">Profile</Text>
+                </TouchableOpacity>
+                <TouchableOpacity className="p-4  border-black">
+                  <Text className="text-black text-xl">Community</Text>
+                </TouchableOpacity>
+                <TouchableOpacity className="p-4  border-black">
+                  <Text className="text-black text-xl">Settings</Text>
+                </TouchableOpacity>
+              </View>
+              <TouchableOpacity className="p-4  border-gray">
+                <Text className="text-black text-xl">Sign Out</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        )}
+
         <View className='mx-6'>
 
-        <View>
-      <View className="flex-row justify-between items-center mt-4 px-4">
-        <TouchableOpacity className='z-51' onPress={() => setShowMenu((prev) => !prev)}>
-          <Ionicons name="menu" className='z-51'  size={24} color="black" />
-        </TouchableOpacity>
+          <View>
+            <View className="flex-row justify-between items-center mt-4 px-4">
+              <TouchableOpacity className='z-51' onPress={() => setShowMenu((prev) => !prev)}>
+                <Ionicons name="menu" className='z-51' size={24} color="black" />
+              </TouchableOpacity>
 
-        <View className="flex-row items-center">
-          <TouchableOpacity onPress={handlePreviousMonth}>
-            <FontAwesome6 name="chevron-left" size={18} color="black" />
-          </TouchableOpacity>
-          <Text className="font-semibold mx-2">{months[currentMonthIndex]}</Text>
-          <TouchableOpacity onPress={handleNextMonth}>
-            <FontAwesome6 name="chevron-right" size={18} color="black" />
-          </TouchableOpacity>
-        </View>
+              <View className="flex-row items-center">
+                <TouchableOpacity onPress={handlePreviousMonth}>
+                  <FontAwesome6 name="chevron-left" size={18} color="black" />
+                </TouchableOpacity>
+                <Text className="font-semibold mx-2">{months[currentMonthIndex]}</Text>
+                <TouchableOpacity onPress={handleNextMonth}>
+                  <FontAwesome6 name="chevron-right" size={18} color="black" />
+                </TouchableOpacity>
+              </View>
 
-        <TouchableOpacity>
-          <Ionicons name="notifications" size={24} color="black" />
-        </TouchableOpacity>
-      </View>
-
-      
-    </View>
+              <TouchableOpacity>
+                <Ionicons name="notifications" size={24} color="black" />
+              </TouchableOpacity>
+            </View>
+          </View>
 
           <View className="flex-col justify-center align-center w-full mt-6">
             <Text className=' text-sm font-pregular text-center text-gray-600 '>
@@ -133,17 +100,17 @@ const Home = () => {
 
           <View className='flex-row justify-between gap-6 mt-6'>
             <Financials title="Income" amount="9000" bg='green' arrowIconName='arrow-down' />
-            <Financials title="Expenses" amount="4000" bg='red' arrowIconName='arrow-up' />
+            <Financials title="Expenses" amount={user.totalExpenses} bg='red' arrowIconName='arrow-up' />
           </View>
 
           <View className='w-full border-4 border-gray-50 rounded-3xl flex-col
             mt-6 p-6 gap-6'>
-            <CurrencyContext.Provider value={{ currency, totalExpenses }}>
+            <CurrencyContext.Provider value={{ currency }}>
               <TopPartExpenses />
             </CurrencyContext.Provider>
-            <PieChartContext.Provider value={{ categoryData, currency, totalExpenses }}>
+            <CurrencyContext.Provider value={{ currency }}>
               <LowPartExpenses />
-            </PieChartContext.Provider>
+            </CurrencyContext.Provider>
           </View>
 
           <RecentExpenses />

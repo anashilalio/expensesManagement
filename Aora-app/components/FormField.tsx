@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import React, { useState } from 'react'
 import { Image, Text, TextInput, TouchableOpacity, View } from 'react-native'
 import Eye from "../assets/icons/eye.png"
 import EyeHide from "../assets/icons/eye-hide.png"

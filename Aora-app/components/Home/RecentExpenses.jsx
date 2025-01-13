@@ -1,8 +1,15 @@
 import { Text, View, TouchableOpacity } from 'react-native';
 import React from 'react';
-import Expense from './Expense';
+import Expense from '../Expense';
 import { router } from 'expo-router';
+import { useAuth } from '../AuthContext';
+
 const RecentExpenses = () => {
+
+  const { user, setuser } = useAuth()
+
+  const numberOfExpenses = 5
+
   const handleSeeMore = () => {
     router.push('/(tabs)/expenses')
   };
@@ -22,10 +29,21 @@ const RecentExpenses = () => {
       </View>
 
       <View className='flex-col gap-4 mt-4'>
-        <Expense category="Shopping" name="Groceries" amount="1200" date={new Date()}/>
-        <Expense category="Food" name="Macdonalds" amount="135" date={new Date()}/>
-        <Expense category="Entertainment" name="Cinema" amount="70" date={new Date()}/>
-        <Expense category="Transport" name="Bus" amount="15" date={new Date()}/>
+        {
+          user.expenses
+            .filter((expense, index) => index < numberOfExpenses)
+            .map((expense, index) => {
+              return (
+                <Expense
+                  key={index}
+                  description={expense.description}
+                  category={expense.category}
+                  amount={expense.amount}
+                  date={expense.date}
+                />
+              );
+            })
+        }
       </View>
     </View>
   );

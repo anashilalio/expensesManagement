@@ -12,6 +12,10 @@ import {
 import RNPickerSelect from 'react-native-picker-select';
 
 import * as ImagePicker from 'expo-image-picker';
+import {formatISO} from 'date-fns'
+import { addExpenseToDB } from '@/api/expense';
+import { ExpenseType } from '@/types/types';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 const Add = () => {
   const [repeatTransaction, setRepeatTransaction] = useState(false);
@@ -20,7 +24,13 @@ const Add = () => {
   const [selectedWallet, setSelectedWallet] = useState<string | undefined>(undefined);
   const [showSuccess , setShowSucess ] = useState(false);
   const [attachments, setAttachments] = useState<string[]>([]);
-  const completed = ()=>{
+  const [expense, setExpense] = useState<ExpenseType>({
+    category: '',
+    description: '',
+    amount: 0,
+    date: ''
+  })
+  const expenseAddedNotif = ()=>{
     setShowSucess(true);
     setTimeout(()=>{
       setShowSucess(false);
@@ -72,158 +82,179 @@ const Add = () => {
     }
   };
 
+  const addExpense = async () => {
+    console.log("in add expense");
+    
+    let date = formatISO( new Date() )
+    setExpense({...expense, date: date})
+    const expenseAdded = await addExpenseToDB(expense)
+    if(expenseAdded){
+      expenseAddedNotif()
+    }
+  }
+
   return (
-    <View className="flex-1 bg-red-500 relative">
-     
-      <View className="flex-1 justify-center items-center mt-12">
-        <View className="flex-row items-center border-b border-white pb-2 w-3/4">
-          <Text className="text-white text-3xl">$</Text>
-          <TextInput
-            className="flex-1 text-white text-4xl text-left"
-            keyboardType="numeric"
-            value={budgetAmount}
-            onChangeText={setBudgetAmount}
-            placeholder="0"
-            placeholderTextColor="#ffffff88"
-          />
-        </View>
-      </View>
+    <SafeAreaView className='h-full'>
+    
+      <View className="flex-1 bg-red-500 relative">
 
-      <View className="bg-white rounded-t-3xl p-6">
-        <View className="mb-4">
-          <Text className="text-gray-500 mb-2">Category</Text>
-          <RNPickerSelect
-            onValueChange={(value) => setSelectedCategory(value)}
-            items={categories}
-            placeholder={{
-              label: 'Select a Category',
-              value: null,
-              color: '#9CA3AF',
-            }}
-            style={{
-              inputAndroid: {
-                backgroundColor: '#FFFFFF',
-                borderRadius: 8,
-                borderColor: '#E5E7EB',
-                borderWidth: 1,
-                padding: 12,
-                color: '#6B7280',
-              },
-            }}
-          />
+        <View className="flex-1 justify-center items-center mt-12">
+          <View className="flex-row items-center border-b border-white pb-2 w-3/4">
+            <Text className="text-white text-3xl">$</Text>
+            <TextInput
+              className="flex-1 text-white text-4xl text-left"
+              keyboardType="numeric"
+              value={`${expense.amount}`}
+              onChangeText={(input) => setExpense({...expense, amount: parseFloat(input)})}
+              placeholder="0"
+              placeholderTextColor="#ffffff88"
+            />
+          </View>
         </View>
 
-        <View className="mb-4">
-          <Text className="text-gray-500 mb-2">Description</Text>
-          <TextInput
-            className="border border-gray-300 rounded-lg p-4"
-            placeholder="Enter description"
-            placeholderTextColor="#9CA3AF"
-          />
-        </View>
+        <View className="bg-white rounded-t-3xl p-6">
 
-        <View className="mb-4">
-          <Text className="text-gray-500 mb-2">Wallet</Text>
-          <RNPickerSelect
-            onValueChange={(value) => setSelectedWallet(value)}
-            items={wallet}
-            placeholder={{
-              label: 'Select a Wallet',
-              value: null,
-              color: '#9CA3AF',
-            }}
-            style={{
-              inputAndroid: {
-                backgroundColor: '#FFFFFF',
-                borderRadius: 8,
-                borderColor: '#E5E7EB',
-                borderWidth: 1,
-                padding: 12,
-                color: '#6B7280',
-              }
-            }}
-          />
-        </View>
+          <View className="mb-4">
+            <Text className="text-gray-500 mb-2">Category</Text>
+            <RNPickerSelect
+              onValueChange={(value) => setExpense({...expense, category: value})}
+              items={categories}
+              placeholder={{
+                label: 'Select a Category',
+                value: null,
+                color: '#9CA3AF',
+              }}
+              style={{
+                inputAndroid: {
+                  backgroundColor: '#FFFFFF',
+                  borderRadius: 8,
+                  borderColor: '#E5E7EB',
+                  borderWidth: 1,
+                  padding: 12,
+                  color: '#6B7280',
+                },
+              }}
+            />
+          </View>
 
-        <View className="mb-4">
+          <View className="mb-4">
+            <Text className="text-gray-500 mb-2">Description</Text>
+            <TextInput
+              className="border border-gray-300 rounded-lg p-4"
+              placeholder="Enter description"
+              placeholderTextColor="#9CA3AF"
+              value={expense.description}
+              onChangeText={(input) => setExpense({...expense, description: input})}
+            />
+          </View>
+
+          <View className="mb-4">
+            <Text className="text-gray-500 mb-2">Wallet</Text>
+            <RNPickerSelect
+              onValueChange={(value) => setSelectedWallet(value)}
+              items={wallet}
+              placeholder={{
+                label: 'Select a Wallet',
+                value: null,
+                color: '#9CA3AF',
+              }}
+              style={{
+                inputAndroid: {
+                  backgroundColor: '#FFFFFF',
+                  borderRadius: 8,
+                  borderColor: '#E5E7EB',
+                  borderWidth: 1,
+                  padding: 12,
+                  color: '#6B7280',
+                }
+              }}
+            />
+          </View>
+
+          <View className="mb-4">
+            <TouchableOpacity
+              className="border border-dashed border-gray-300 rounded-lg p-4 flex-row justify-center items-center"
+              onPress={pickImages}
+            >
+              <Text className="text-gray-500">📎 Add attachment</Text>
+            </TouchableOpacity>
+          </View>
+
+          {attachments.length > 0 && (
+            <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginVertical: 8 }}>
+              {attachments.map((uri, index) => (
+                <View key={index} style={{ marginRight: 10 }} className='relative'>
+                  <TouchableOpacity className=" absolute z-10 right-1 "           onPress={() => handleDeleteImage(index)}>              
+                    <Text className=" text-white bg-black bg-opacity-50  z-10 rounded-full  top-1 px-1">X</Text>
+                  </TouchableOpacity>
+                  <Image 
+                    source={{ uri }}
+                    style={{ width: 80, height: 80, borderRadius: 8 }}
+                  />
+                </View>
+              ))}
+            </ScrollView>
+          )}
+
+          <View className="flex-row justify-between items-center mt-4">
+            <Text className="text-gray-500">Repeat</Text>
+            <Switch
+              value={repeatTransaction}
+              onValueChange={(value) => setRepeatTransaction(value)}
+              trackColor={{ false: '#767577', true: '#7C3AED' }}
+              thumbColor={repeatTransaction ? '#7C3AED' : '#f4f3f4'}
+            />
+          </View>
+
           <TouchableOpacity
-            className="border border-dashed border-gray-300 rounded-lg p-4 flex-row justify-center items-center"
-            onPress={pickImages}
+            className="bg-violet p-4 rounded-lg mt-6"
+            onPress={() => addExpense()}
           >
-            <Text className="text-gray-500">📎 Add attachment</Text>
+            <Text className="text-white text-center text-lg font-bold">Continue</Text>
           </TouchableOpacity>
         </View>
 
-        {attachments.length > 0 && (
-          <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginVertical: 8 }}>
-            {attachments.map((uri, index) => (
-              <View key={index} style={{ marginRight: 10 }} className='relative'>
-                <TouchableOpacity className=" absolute z-10 right-1 "           onPress={() => handleDeleteImage(index)}>              
-                  <Text className=" text-white bg-black bg-opacity-50  z-10 rounded-full  top-1 px-1">X</Text>
-                </TouchableOpacity>
-                <Image 
-                  source={{ uri }}
-                  style={{ width: 80, height: 80, borderRadius: 8 }}
-                />
-              </View>
-            ))}
-          </ScrollView>
-        )}
-
-        <View className="flex-row justify-between items-center mt-4">
-          <Text className="text-gray-500">Repeat</Text>
-          <Switch
-            value={repeatTransaction}
-            onValueChange={(value) => setRepeatTransaction(value)}
-            trackColor={{ false: '#767577', true: '#7C3AED' }}
-            thumbColor={repeatTransaction ? '#7C3AED' : '#f4f3f4'}
-          />
-        </View>
-
-        <TouchableOpacity className="bg-violet p-4 rounded-lg mt-6">
-          <Text className="text-white text-center text-lg font-bold"  onPress={completed}>Continue</Text>
-        </TouchableOpacity>
-      </View>
-      <Modal
-        transparent
-        animationType="fade"
-        visible={showSuccess}
-        onRequestClose={() => setShowSucess(false)}
-      >
-        <View
-          style={{
-            flex: 1,
-            justifyContent: 'center',
-            alignItems: 'center',
-            backgroundColor: 'rgba(0, 0, 0, 0.5)',
-          }}
+        <Modal
+          transparent
+          animationType="fade"
+          visible={showSuccess}
+          onRequestClose={() => setShowSucess(false)}
         >
           <View
             style={{
-              width: 200,
-              padding: 20,
-              backgroundColor: 'white',
-              borderRadius: 10,
+              flex: 1,
+              justifyContent: 'center',
               alignItems: 'center',
+              backgroundColor: 'rgba(0, 0, 0, 0.5)', // Semi-transparent background
             }}
           >
-            <Text
+            <View
               style={{
-                fontSize: 18,
-                fontWeight: 'bold',
-                color: '#34D399', 
-                marginBottom: 10,
+                width: 200,
+                padding: 20,
+                backgroundColor: 'white',
+                borderRadius: 10,
+                alignItems: 'center',
               }}
             >
-              Success!
-            </Text>
-            <Text style={{ textAlign: 'center', color: '#6B7280' }}>
-              Your transaction was added successfully.
-            </Text>
+              <Text
+                style={{
+                  fontSize: 18,
+                  fontWeight: 'bold',
+                  color: '#34D399', // Green text
+                  marginBottom: 10,
+                }}
+              >
+                Success!
+              </Text>
+              <Text style={{ textAlign: 'center', color: '#6B7280' }}>
+                Your transaction was added successfully.
+              </Text>
+            </View>
           </View>
-        </View>
-      </Modal>
-    </View>
+        </Modal>
+      </View>
+    </SafeAreaView>
   );
 };
 
