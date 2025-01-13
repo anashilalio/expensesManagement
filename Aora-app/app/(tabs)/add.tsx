@@ -195,7 +195,7 @@ const Add = () => {
             flex: 1,
             justifyContent: 'center',
             alignItems: 'center',
-            backgroundColor: 'rgba(0, 0, 0, 0.5)', // Semi-transparent background
+            backgroundColor: 'rgba(0, 0, 0, 0.5)',
           }}
         >
           <View
@@ -211,7 +211,7 @@ const Add = () => {
               style={{
                 fontSize: 18,
                 fontWeight: 'bold',
-                color: '#34D399', // Green text
+                color: '#34D399', 
                 marginBottom: 10,
               }}
             >
