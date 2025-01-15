@@ -1,31 +1,24 @@
 import CustomButton from '@/components/Buttons/CustomButton'
 import FormField from '@/components/FormField'
-import React, { createContext, useEffect, useState } from 'react'
+import React, { useState } from 'react'
 import { ScrollView, Text, View } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
-import { Link } from "expo-router"
+import { Link, useRouter } from "expo-router"
 import Google from '../../assets/icons/google.png'
 import { useHeaderHeight } from '@react-navigation/elements'
 import { Checkbox } from 'expo-checkbox'
-import axios from 'axios'
-import { createUser } from '@/api/user'
+import { signUpUser } from '@/api/auth'
 
-interface UserInfoType{
+interface UserInfoType {
   username: string,
   email: string,
   password: string
 }
 
-const UserInfoContext = createContext<UserInfoType>({
-  username: '',
-  email: '',
-  password: ''
-})
-
 const SignUp = () => {
 
   const [userInfo, setUserInfo] = useState<UserInfoType>({
-    username:'',
+    username: '',
     email: '',
     password: ''
   })
@@ -35,15 +28,19 @@ const SignUp = () => {
   const [agreeingToTerms, setAgreeingToTerms] = useState(false)
 
   const headerHeight = useHeaderHeight();
+  const router = useRouter()
 
-  const signUp = () => {
-    createUser(userInfo.username, userInfo.email, userInfo.password)
+  const signUp = async () => {
+    const signUpSuccess = await signUpUser(userInfo.username, userInfo.email, userInfo.password)
+    if (signUpSuccess) {
+      router.replace('/(tabs)/home')
+    }
   }
 
   return (
     <SafeAreaView className='bg-white h-full'>
-      <ScrollView contentContainerStyle={{justifyContent: 'center', flexGrow: 1}}>
-        <View className='px-6' style={{marginBottom: headerHeight/2}}>
+      <ScrollView contentContainerStyle={{ justifyContent: 'center', flexGrow: 1 }}>
+        <View className='px-6' style={{ marginBottom: headerHeight / 2 }}>
 
           <View className='flex-col gap-6'>
             <FormField
@@ -77,7 +74,7 @@ const SignUp = () => {
               style={{
                 borderWidth: 2,
                 borderRadius: 5,
-                borderColor: '#7F3DFF' 
+                borderColor: '#7F3DFF'
               }}
             />
             <Text className="flex-1 font-psemibold text-sm">
@@ -110,7 +107,7 @@ const SignUp = () => {
               isLoading={isSubmitting}
             />
           </View>
-          
+
           <View className='justify-center mt-7 flex-row gap-2'>
             <Text className='text-base text-text-gray font-pregular'>
               Have an account already?

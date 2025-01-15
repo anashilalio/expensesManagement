@@ -1,16 +1,16 @@
 import { Router } from 'express'
-import { Expense } from '../schemas/expense.js'
+import { Category } from '../schemas/category.js'
 import { checkSchema, matchedData, validationResult } from 'express-validator';
-import { ExpenseValidationSchema } from '../utils/validationSchemas.mjs';
+import { CategoryValidationSchema } from '../utils/validationSchemas.mjs';
 
 const router = Router()
 
 router.post(
-    "/api/expense/add",
-    checkSchema(ExpenseValidationSchema),
+    "/api/category/add",
+    checkSchema(CategoryValidationSchema),
     async (request, response) => {
         const result = validationResult(request)
-
+        
         if(!result.isEmpty()){
             return response.status(400).send({ errors: result.array()})
         }
@@ -19,11 +19,11 @@ router.post(
         
         data.userId = request.session.passport.user        
         
-        const newExpense = new Expense(data)
+        const newCategory = new Category(data)
 
         try {
-            const savedExpense = await newExpense.save()
-            return response.status(201).send(savedExpense)
+            const savedCategory = await newCategory.save()
+            return response.status(201).send(savedCategory)
         } catch (error) {
             console.dir(error)
             return response.send(400).send()

@@ -1,8 +1,9 @@
 import { useFonts } from "expo-font";
 import { SplashScreen, Stack } from "expo-router";
-import { useEffect } from "react";
+import React, { useEffect } from "react";
 import "../global.css";
 import { StatusBar } from "expo-status-bar";
+import { AuthProvider } from "@/components/AuthContext";
 
 SplashScreen.preventAutoHideAsync();
 
@@ -25,11 +26,12 @@ export default function RootLayout() {
     if (fontsLoaded) SplashScreen.hideAsync();
   }, [fontsLoaded, errorFontLoading])
 
-  return(
+  return (
+
     <Stack>
-      <Stack.Screen name="index" options={{headerShown: false}}/>
-      <Stack.Screen name="(auth)" options={{headerShown: false}}/>
-      <Stack.Screen name="(tabs)" options={{headerShown: false}}/> 
+      <Stack.Screen name="index" options={{ headerShown: false }} />
+      <Stack.Screen name="(auth)" options={{ headerShown: false }} />
+      <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
       <StatusBar
         backgroundColor='#FFFFFF'
         style="dark"

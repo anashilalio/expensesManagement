@@ -3,32 +3,37 @@ import React, { useContext, useMemo } from "react"
 import { CurrencyContext } from "@/app/(tabs)/home"
 import { formatAmount, formatDate } from "@/utils/format"
 import { categoryIcons } from "@/utils/IconMapping"
+import DefaultIcon from "./category-icons/DefaultIcon"
 
 interface ExpenseProps {
-    name?: string,
+    description?: string,
     category: string,
     amount: number,
-    date: Date
+    date: string
 }
 
-const Expense: React.FC<ExpenseProps> = ({ name, category, amount, date }) => {
+const Expense: React.FC<ExpenseProps> = ({ description, category, amount, date }) => {
 
-    const { currency, totalExpenses } = useContext(CurrencyContext)
+    const { currency } = useContext(CurrencyContext)
 
-    const expenseName = name || category
+    const expenseDescription = description || category
     const iconSize = 30
     const IconComponent = categoryIcons[category] || null;
 
     return (
         <View className='flex-row items-center gap-3 px-6 py-5 border-4 border-gray-50 rounded-3xl'>
-            {IconComponent && <IconComponent size={iconSize} color="cyan"/>}
+            {(   
+                IconComponent
+                ? <IconComponent size={iconSize} />
+                : <DefaultIcon size={iconSize} name={category}/>
+            )}
             <View className="flex-row flex-1 items-center justify-between">
                 <View className="flex-col gap-1">
                     <Text className="font-psemibold text-base text-title">
                         {category}
                     </Text>
                     <Text className="font-plight text-sm text-subtitle">
-                        {expenseName}
+                        {expenseDescription}
                     </Text>
                 </View>
                 <View className="flex-col gap-1">

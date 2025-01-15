@@ -1,14 +1,20 @@
-import express, { request, response } from "express";
+import express from "express";
 import mongoose from "mongoose";
-import userRouter from "./routes/user.mjs"
+import loginRouter from "./routes/auth/login.mjs"
+import signUpRouter from "./routes/auth/signup.mjs"
 import expenseRouter from "./routes/expense.mjs"
 import budgetRouter from "./routes/budget.mjs"
+import categoryRouter from "./routes/category.mjs"
+import userRouter from "./routes/user.mjs"
 import cookieParser from "cookie-parser";
 import session from "express-session";
 import passport from "passport";
-import "./startegies/local.mjs"
+import MongoStore from "connect-mongo";
 
 const app = express();
+
+const PORT = process.env.PORT || 3000;
+const mongodbUrl = "mongodb://localhost/app_db"
 
 // middleware
 app.use(express.json());
@@ -18,19 +24,20 @@ app.use(session({
   saveUninitialized: false,
   resave: false,
   cookie: {
-    maxAge: 60000
-  }
+    maxAge: 1800000
+  },
+  store: MongoStore.create({
+    mongoUrl: mongodbUrl
+  })
 }))
 app.use(passport.initialize())
 app.use(passport.session())
 
 // routes
-app.use(userRouter, expenseRouter, budgetRouter)
+app.use(signUpRouter, loginRouter, expenseRouter, budgetRouter, categoryRouter, userRouter)
 
 // Set port
-const PORT = process.env.PORT || 3000;
 
-const mongodbUrl = "mongodb://localhost/app_db"
 mongoose.connect(mongodbUrl)
   .then(() => console.log("connected to mongoDB"))
   .catch((err) => console.log("error"))
@@ -65,33 +72,4 @@ app.get('/api/cart', (request, response) => {
     return response.status(401).send({msg: "not connected"})
 
   return response.status(201).send(request.session.cart ?? [])
-})
-
-app.post(
-  '/api/auth',
-  passport.authenticate("local"),
-  (request, response) => {
-    response.sendStatus(200)
-  }
-)
-app.get('/api/auth/session', (request, response) => {
-  console.log("status : ");
-  console.log(request.user);
-  console.log(request.session);
-  
-  if(request.user)
-    return response.status(200).send(request.user)
-  else
-    return response.status(401).send({msg: "not authen"})
-})
-
-app.post("/api/auth/logout", (request, response) => {
-  if(!request.user)
-    return response.status(400).send({msg: "not authen"})
-  request.logout((err) => {
-    if(err)
-      return response.status(400).send({msg: "err in logout"})
-    else
-      return response.status(200).send("ok")
-  })
 })
