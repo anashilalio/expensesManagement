@@ -74,6 +74,7 @@ export const UserValidationSchema = {
         }
     }
 }
+
 export const BudgetValidationSchema = {
     category: {
         notEmpty: {
@@ -93,6 +94,25 @@ export const BudgetValidationSchema = {
                     return true
                 throw new Error("Amount must be a number");
             }
+        }
+    }
+}
+
+export const CategoryValidationSchema = {
+    name: {
+        notEmpty: {
+            errorMessage: 'Category is empty!'
+        },
+        isString: {
+            errorMessage: 'Category must be a string!'
+        }
+    },
+    color: {
+        notEmpty: {
+            errorMessage: 'Category is empty!'
+        },
+        isString: {
+            errorMessage: 'Category must be a string!'
         }
     }
 }

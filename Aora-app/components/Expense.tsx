@@ -3,6 +3,7 @@ import React, { useContext, useMemo } from "react"
 import { CurrencyContext } from "@/app/(tabs)/home"
 import { formatAmount, formatDate } from "@/utils/format"
 import { categoryIcons } from "@/utils/IconMapping"
+import DefaultIcon from "./category-icons/DefaultIcon"
 
 interface ExpenseProps {
     description?: string,
@@ -21,7 +22,11 @@ const Expense: React.FC<ExpenseProps> = ({ description, category, amount, date }
 
     return (
         <View className='flex-row items-center gap-3 px-6 py-5 border-4 border-gray-50 rounded-3xl'>
-            {IconComponent && <IconComponent size={iconSize} color="cyan"/>}
+            {(   
+                IconComponent
+                ? <IconComponent size={iconSize} />
+                : <DefaultIcon size={iconSize} name={category}/>
+            )}
             <View className="flex-row flex-1 items-center justify-between">
                 <View className="flex-col gap-1">
                     <Text className="font-psemibold text-base text-title">

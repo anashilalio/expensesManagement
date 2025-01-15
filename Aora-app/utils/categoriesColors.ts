@@ -9,3 +9,11 @@ export const categoriesColors: colorMapping = {
     Shopping:"#ff595e",
     Entertainment: "#6a4c93"
 }
+
+export const customCategoriesColors: colorMapping = {
+    first: '#FFAF45',
+    second: '#FB6D48',
+    third: '#D74B76',
+    fourth: '#673F69',
+    fifth: '#009990'
+}

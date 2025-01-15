@@ -5,7 +5,6 @@ import React, { useContext, useEffect, useMemo, useState } from "react";
 import { CurrencyContext } from "@/app/(tabs)/home";
 import { useSharedValue, withTiming } from "react-native-reanimated";
 import { formatAmount } from "../../utils/format"
-import { categoriesColors } from "@/utils/categoriesColors";
 import { useAuth } from "../AuthContext";
 
 const LowPartExpenses = () => {
@@ -45,8 +44,6 @@ const LowPartExpenses = () => {
             angleStart = angleStart + percentage * 360;
             return segment
         })
-        console.log(categoriesDetails);
-
         return categoriesDetails
     },
         [user.CategoriesTotal, user.totalExpenses]
@@ -65,7 +62,7 @@ const LowPartExpenses = () => {
                                 cy={cy}
                                 r={r}
                                 strokeWidth={strokeWidth}
-                                stroke={categoriesColors[category.name]}
+                                stroke={category.color}
                                 circumeference={circumeference}
                                 percentage={category.percentage}
                                 originX={cx}
@@ -82,7 +79,7 @@ const LowPartExpenses = () => {
                     return (
                         <View className="" key={index}>
                             <View className="flex-row gap-2 items-center">
-                                <View className='w-3 h-6 rounded-md' style={{ backgroundColor: categoriesColors[category.name] }}></View>
+                                <View className='w-3 h-6 rounded-md' style={{ backgroundColor: category.color }}></View>
                                 <Text className="text-black font-psemibold text-base">
                                     {category.name}
                                 </Text>

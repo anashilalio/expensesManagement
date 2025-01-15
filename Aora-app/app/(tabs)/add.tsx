@@ -1,47 +1,58 @@
-import React, { useState } from 'react';
-import { 
-  View, 
-  Text, 
-  TextInput, 
-  TouchableOpacity, 
-  Switch, 
-  Image, 
-  ScrollView ,
-  Modal
+import React, { useEffect, useState } from 'react';
+import {
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  Switch,
+  Image,
+  ScrollView,
+  Modal,
 } from 'react-native';
 import RNPickerSelect from 'react-native-picker-select';
-
 import * as ImagePicker from 'expo-image-picker';
-import {formatISO} from 'date-fns'
 import { addExpenseToDB } from '@/api/expense';
 import { ExpenseType } from '@/types/types';
+import { formatISO } from 'date-fns'
+import { useAuth } from '@/components/AuthContext';
+import { addCategoryToDB } from '@/api/category';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 const Add = () => {
+
+  const { user, setUser } = useAuth()
+
   const [repeatTransaction, setRepeatTransaction] = useState(false);
   const [budgetAmount, setBudgetAmount] = useState<string>('0');
   const [selectedCategory, setSelectedCategory] = useState<string | undefined>(undefined);
   const [selectedWallet, setSelectedWallet] = useState<string | undefined>(undefined);
-  const [showSuccess , setShowSucess ] = useState(false);
+  const [showSuccess, setShowSucess] = useState(false);
   const [attachments, setAttachments] = useState<string[]>([]);
+
+  const [categories, setCategories] = useState<any>([
+    {label:'',value:''}
+  ]);
+
+  useEffect(() => {
+    console.log(user.categories);
+    
+    const categoriesLabelValue = user.categories.map((category:any) => ({
+      label: category.name,
+      value: category.name
+    }))
+
+    setCategories(categoriesLabelValue)
+  }, [user.categories])
+
   const [expense, setExpense] = useState<ExpenseType>({
     category: '',
     description: '',
     amount: 0,
     date: ''
   })
-  const expenseAddedNotif = ()=>{
-    setShowSucess(true);
-    setTimeout(()=>{
-      setShowSucess(false);
-    },3000)
-  }
-  const categories = [
-    { label: 'Transportation', value: 'Transportation' },
-    { label: 'Food', value: 'Food' },
-    { label: 'Entertainment', value: 'Entertainment' },
-    { label: 'Shopping', value: 'Shopping' },
-  ];
+
+  const [showNewCategoryModal, setShowNewCategoryModal] = useState(false);
+  const [newCategoryName, setNewCategoryName] = useState('');
 
   const wallet = [
     { label: 'Paypal', value: 'Paypal' },
@@ -49,12 +60,17 @@ const Add = () => {
     { label: 'BqChaabi', value: 'BqChaabi' },
   ];
 
+  const expenseAddedNotif = () => {
+    setShowSucess(true);
+    setTimeout(() => {
+      setShowSucess(false);
+    }, 3000)
+  }
+
   const handleDeleteImage = (index: number) => {
-    setAttachments((prevAttachments) => 
-      prevAttachments.filter((_, i) => i !== index)
-    );
+    setAttachments((prev) => prev.filter((_, i) => i !== index));
   };
-  
+
   const pickImages = async () => {
     try {
       const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
@@ -63,18 +79,15 @@ const Add = () => {
         return;
       }
 
-
       const result = await ImagePicker.launchImageLibraryAsync({
         mediaTypes: ImagePicker.MediaTypeOptions.Images,
-        allowsMultipleSelection: true, 
+        allowsMultipleSelection: true,
         base64: false,
         quality: 1,
       });
 
       if (!result.canceled) {
-
         const pickedImages = result.assets.map((asset) => asset.uri);
-
         setAttachments((prev) => [...prev, ...pickedImages]);
       }
     } catch (error) {
@@ -83,29 +96,71 @@ const Add = () => {
   };
 
   const addExpense = async () => {
-    console.log("in add expense");
-    
-    let date = formatISO( new Date() )
-    setExpense({...expense, date: date})
-    const expenseAdded = await addExpenseToDB(expense)
-    if(expenseAdded){
+
+    let date = formatISO(new Date())
+    setExpense({ ...expense, date: date })
+    const newExpense = await addExpenseToDB(expense)
+
+    if (newExpense) {
+
       expenseAddedNotif()
+
+      const updatedExpenses = [newExpense, ...user.expenses, ];
+
+      const updatedTotalExpenses = user.totalExpenses + newExpense.amount
+
+      const updatedCategoriesTotal = [...user.CategoriesTotal];
+
+      const categoryIndex = updatedCategoriesTotal.findIndex((category) => category.name === newExpense.category);
+
+      if (categoryIndex !== -1) {
+        updatedCategoriesTotal[categoryIndex].total += newExpense.amount;
+      } else {
+        updatedCategoriesTotal.push({ name: newExpense.category, total: newExpense.amount });
+      }
+
+      setUser({
+        ...user,
+        expenses: updatedExpenses,
+        totalExpenses: updatedTotalExpenses,
+        CategoriesTotal: updatedCategoriesTotal
+      })
+
     }
   }
 
-  return (
-    <SafeAreaView className='h-full'>
-    
-      <View className="flex-1 bg-red-500 relative">
+  const addCategory = async () => {
+    const newCategory = await addCategoryToDB(newCategoryName)
+    if(newCategory){
+      setUser({
+        ...user,
+        categories: [...user.categories, newCategory]
+      })
+    }
+  }
 
+  const handleAddNewCategory = () => {
+    if (newCategoryName.trim()) {
+      setCategories((prev: any) => [
+        ...prev,
+        { label: newCategoryName, value: newCategoryName },
+      ]);
+      setNewCategoryName('');
+      setShowNewCategoryModal(false);
+    }
+  };
+
+  return (
+    <SafeAreaView className='h-full w-full bg-white'>
+      <View className="flex-1 bg-red-500 relative">
         <View className="flex-1 justify-center items-center mt-12">
           <View className="flex-row items-center border-b border-white pb-2 w-3/4">
             <Text className="text-white text-3xl">$</Text>
             <TextInput
-              className="flex-1 text-white text-4xl text-left"
+              className="flex-1 text-white text-4xl ml-2"
               keyboardType="numeric"
               value={`${expense.amount}`}
-              onChangeText={(input) => setExpense({...expense, amount: parseFloat(input)})}
+              onChangeText={(input) => setExpense({ ...expense, amount: parseFloat(input) })}
               placeholder="0"
               placeholderTextColor="#ffffff88"
             />
@@ -113,11 +168,20 @@ const Add = () => {
         </View>
 
         <View className="bg-white rounded-t-3xl p-6">
+          <View className="mb-2 flex-row justify-between items-center">
+            <Text className="text-gray-500">Category</Text>
+            <TouchableOpacity
+              onPress={() => setShowNewCategoryModal(true)}
+            >
+              <Text className="text-violet font-semibold">
+                + Add New Category
+              </Text>
+            </TouchableOpacity>
+          </View>
 
           <View className="mb-4">
-            <Text className="text-gray-500 mb-2">Category</Text>
             <RNPickerSelect
-              onValueChange={(value) => setExpense({...expense, category: value})}
+              onValueChange={(input) => setExpense({ ...expense, category: input })}
               items={categories}
               placeholder={{
                 label: 'Select a Category',
@@ -140,11 +204,11 @@ const Add = () => {
           <View className="mb-4">
             <Text className="text-gray-500 mb-2">Description</Text>
             <TextInput
-              className="border border-gray-300 rounded-lg p-4"
+              className="border border-gray-300 rounded-lg p-4 text-gray-700"
               placeholder="Enter description"
               placeholderTextColor="#9CA3AF"
               value={expense.description}
-              onChangeText={(input) => setExpense({...expense, description: input})}
+              onChangeText={(input) => setExpense({ ...expense, description: input })}
             />
           </View>
 
@@ -166,7 +230,7 @@ const Add = () => {
                   borderWidth: 1,
                   padding: 12,
                   color: '#6B7280',
-                }
+                },
               }}
             />
           </View>
@@ -181,15 +245,22 @@ const Add = () => {
           </View>
 
           {attachments.length > 0 && (
-            <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginVertical: 8 }}>
+            <ScrollView
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              className="my-2"
+            >
               {attachments.map((uri, index) => (
-                <View key={index} style={{ marginRight: 10 }} className='relative'>
-                  <TouchableOpacity className=" absolute z-10 right-1 "           onPress={() => handleDeleteImage(index)}>              
-                    <Text className=" text-white bg-black bg-opacity-50  z-10 rounded-full  top-1 px-1">X</Text>
+                <View key={index} className="relative mr-2">
+                  <TouchableOpacity
+                    className="absolute z-10 right-1 top-1 bg-black bg-opacity-50 rounded-full px-1"
+                    onPress={() => handleDeleteImage(index)}
+                  >
+                    <Text className="text-white">X</Text>
                   </TouchableOpacity>
-                  <Image 
+                  <Image
                     source={{ uri }}
-                    style={{ width: 80, height: 80, borderRadius: 8 }}
+                    className="w-20 h-20 rounded-md"
                   />
                 </View>
               ))}
@@ -210,7 +281,9 @@ const Add = () => {
             className="bg-violet p-4 rounded-lg mt-6"
             onPress={() => addExpense()}
           >
-            <Text className="text-white text-center text-lg font-bold">Continue</Text>
+            <Text className="text-white text-center text-lg font-bold">
+              Add
+            </Text>
           </TouchableOpacity>
         </View>
 
@@ -220,36 +293,48 @@ const Add = () => {
           visible={showSuccess}
           onRequestClose={() => setShowSucess(false)}
         >
-          <View
-            style={{
-              flex: 1,
-              justifyContent: 'center',
-              alignItems: 'center',
-              backgroundColor: 'rgba(0, 0, 0, 0.5)', // Semi-transparent background
-            }}
-          >
-            <View
-              style={{
-                width: 200,
-                padding: 20,
-                backgroundColor: 'white',
-                borderRadius: 10,
-                alignItems: 'center',
-              }}
-            >
-              <Text
-                style={{
-                  fontSize: 18,
-                  fontWeight: 'bold',
-                  color: '#34D399', // Green text
-                  marginBottom: 10,
-                }}
-              >
-                Success!
-              </Text>
-              <Text style={{ textAlign: 'center', color: '#6B7280' }}>
+          <View className="flex-1 justify-center items-center bg-black bg-opacity-50">
+            <View className="w-48 p-5 bg-white rounded-lg items-center">
+              <Text className="text-lg font-bold text-emerald-400 mb-2">Success!</Text>
+              <Text className="text-center text-gray-500">
                 Your transaction was added successfully.
               </Text>
+            </View>
+          </View>
+        </Modal>
+
+        <Modal
+          transparent
+          animationType="slide"
+          visible={showNewCategoryModal}
+          onRequestClose={() => setShowNewCategoryModal(false)}
+        >
+          <View className="flex-1 justify-center items-center bg-black bg-opacity-50">
+            <View className="w-64 p-6 bg-white rounded-xl">
+              <Text className="text-lg font-semibold text-gray-700 mb-3">
+                Add New Category
+              </Text>
+              <TextInput
+                className="border border-gray-300 rounded-md p-2 mb-3"
+                placeholder="Category Name"
+                placeholderTextColor="#9CA3AF"
+                value={newCategoryName}
+                onChangeText={(input) => setNewCategoryName(input)}
+              />
+              <View className="flex-row justify-between">
+                <TouchableOpacity
+                  className="bg-gray-300 p-2 rounded-md"
+                  onPress={() => setShowNewCategoryModal(false)}
+                >
+                  <Text className="text-gray-700">Cancel</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  className="bg-violet p-2 rounded-md"
+                  onPress={() => addCategory()}
+                >
+                  <Text className="text-white">Add</Text>
+                </TouchableOpacity>
+              </View>
             </View>
           </View>
         </Modal>

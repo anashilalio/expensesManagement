@@ -3,7 +3,6 @@ import axios from "axios";
 import React, { createContext, useContext, useEffect, useState } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage"
 import { ActivityIndicator } from "react-native";
-import Expense from "./Expense";
 
 interface AuthProviderProps {
     children: React.ReactNode;
@@ -54,8 +53,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
             attachCategoriesTotal(data)
 
+            const sortedExpenses = data.expenses.sort((a:any, b:any) => new Date(b.date) - new Date(a.date));
+            
+            data.expenses = sortedExpenses
             setUser(data)
-            console.log(data);
             
             await AsyncStorage.setItem('@user', JSON.stringify(data))
         } catch (error) {

@@ -4,6 +4,7 @@ import loginRouter from "./routes/auth/login.mjs"
 import signUpRouter from "./routes/auth/signup.mjs"
 import expenseRouter from "./routes/expense.mjs"
 import budgetRouter from "./routes/budget.mjs"
+import categoryRouter from "./routes/category.mjs"
 import userRouter from "./routes/user.mjs"
 import cookieParser from "cookie-parser";
 import session from "express-session";
@@ -33,7 +34,7 @@ app.use(passport.initialize())
 app.use(passport.session())
 
 // routes
-app.use(signUpRouter, loginRouter, expenseRouter, budgetRouter, userRouter)
+app.use(signUpRouter, loginRouter, expenseRouter, budgetRouter, categoryRouter, userRouter)
 
 // Set port
 

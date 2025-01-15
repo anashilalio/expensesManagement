@@ -8,6 +8,10 @@ const categorySchema = new Schema({
   userId: {
     type: mongoose.Schema.Types.ObjectId,
     required: true
+  },
+  color: {
+    type: mongoose.Schema.Types.String,
+    required: true
   }
 });
 

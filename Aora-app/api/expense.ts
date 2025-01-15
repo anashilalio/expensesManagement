@@ -6,10 +6,8 @@ export const addExpenseToDB = async (expense: ExpenseType) => {
     const URL = baseUrl + 'api/expense/add'
     try {
         const response = await axios.post(URL, {...expense})
-        console.log("after post");
-        
-        return response.status === 201
+        return (response.status === 201 ? response.data : null)
     } catch (error) {
-        return false
+        return null
     }
 }
