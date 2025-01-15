@@ -26,7 +26,6 @@ const Add = () => {
     { label: 'Entertainment', value: 'Entertainment' },
     { label: 'Shopping', value: 'Shopping' },
   ]);
-
   const [showNewCategoryModal, setShowNewCategoryModal] = useState(false);
   const [newCategoryName, setNewCategoryName] = useState('');
 
@@ -35,6 +34,8 @@ const Add = () => {
     { label: 'CIH', value: 'CIH' },
     { label: 'BqChaabi', value: 'BqChaabi' },
   ];
+
+  const [showImageOptionsModal, setShowImageOptionsModal] = useState(false);
 
   const completed = () => {
     setShowSucess(true);
@@ -47,8 +48,11 @@ const Add = () => {
     setAttachments((prev) => prev.filter((_, i) => i !== index));
   };
 
-  const pickImages = async () => {
+ 
+  const pickFromGallery = async () => {
     try {
+      setShowImageOptionsModal(false);
+
       const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
       if (status !== 'granted') {
         alert('Sorry, we need camera roll permissions to make this work!');
@@ -67,10 +71,37 @@ const Add = () => {
         setAttachments((prev) => [...prev, ...pickedImages]);
       }
     } catch (error) {
-      console.log('Error picking images:', error);
+      console.log('Error picking images from gallery:', error);
     }
   };
 
+
+  const takePhoto = async () => {
+    try {
+      setShowImageOptionsModal(false);
+
+      const { status } = await ImagePicker.requestCameraPermissionsAsync();
+      if (status !== 'granted') {
+        alert('Sorry, we need camera permissions to make this work!');
+        return;
+      }
+
+      const result = await ImagePicker.launchCameraAsync({
+        base64: false,
+        quality: 1,
+      });
+
+      if (!result.canceled) {
+
+        const newPhotoUri = result.assets[0].uri;
+        setAttachments((prev) => [...prev, newPhotoUri]);
+      }
+    } catch (error) {
+      console.log('Error taking photo:', error);
+    }
+  };
+
+  
   const handleAddNewCategory = () => {
     if (newCategoryName.trim()) {
       setCategories((prev) => [
@@ -101,12 +132,8 @@ const Add = () => {
       <View className="bg-white rounded-t-3xl p-6">
         <View className="mb-2 flex-row justify-between items-center">
           <Text className="text-gray-500">Category</Text>
-          <TouchableOpacity
-            onPress={() => setShowNewCategoryModal(true)}
-          >
-            <Text className="text-violet font-semibold">
-              + Add New Category
-            </Text>
+          <TouchableOpacity onPress={() => setShowNewCategoryModal(true)}>
+            <Text className="text-violet font-semibold">+ Add New Category</Text>
           </TouchableOpacity>
         </View>
 
@@ -167,18 +194,14 @@ const Add = () => {
         <View className="mb-4">
           <TouchableOpacity
             className="border border-dashed border-gray-300 rounded-lg p-4 flex-row justify-center items-center"
-            onPress={pickImages}
+            onPress={() => setShowImageOptionsModal(true)}
           >
             <Text className="text-gray-500">📎 Add attachment</Text>
           </TouchableOpacity>
         </View>
 
         {attachments.length > 0 && (
-          <ScrollView
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            className="my-2"
-          >
+          <ScrollView horizontal showsHorizontalScrollIndicator={false} className="my-2">
             {attachments.map((uri, index) => (
               <View key={index} className="relative mr-2">
                 <TouchableOpacity
@@ -187,10 +210,7 @@ const Add = () => {
                 >
                   <Text className="text-white">X</Text>
                 </TouchableOpacity>
-                <Image
-                  source={{ uri }}
-                  className="w-20 h-20 rounded-md"
-                />
+                <Image source={{ uri }} className="w-20 h-20 rounded-md" />
               </View>
             ))}
           </ScrollView>
@@ -206,13 +226,8 @@ const Add = () => {
           />
         </View>
 
-        <TouchableOpacity
-          className="bg-violet p-4 rounded-lg mt-6"
-          onPress={completed}
-        >
-          <Text className="text-white text-center text-lg font-bold">
-            Continue
-          </Text>
+        <TouchableOpacity className="bg-violet p-4 rounded-lg mt-6" onPress={completed}>
+          <Text className="text-white text-center text-lg font-bold">Continue</Text>
         </TouchableOpacity>
       </View>
 
@@ -264,6 +279,37 @@ const Add = () => {
                 <Text className="text-white">Add</Text>
               </TouchableOpacity>
             </View>
+          </View>
+        </View>
+      </Modal>
+
+      <Modal
+        transparent
+        animationType="fade"
+        visible={showImageOptionsModal}
+        onRequestClose={() => setShowImageOptionsModal(false)}
+      >
+        <View className="flex-1 justify-center items-center bg-black bg-opacity-50">
+          <View className="w-64 p-6 bg-white rounded-xl">
+            <Text className="text-lg font-semibold text-gray-700 mb-3">Add Attachment</Text>
+
+            <TouchableOpacity
+              className="bg-gray-300 p-3 rounded-md mb-3"
+              onPress={pickFromGallery}
+            >
+              <Text className="text-center text-gray-700">Pick from Gallery</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity className="bg-gray-300 p-3 rounded-md" onPress={takePhoto}>
+              <Text className="text-center text-gray-700">Take a Photo</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              className="mt-4 p-2 rounded-md items-center"
+              onPress={() => setShowImageOptionsModal(false)}
+            >
+              <Text className="text-gray-500">Cancel</Text>
+            </TouchableOpacity>
           </View>
         </View>
       </Modal>
