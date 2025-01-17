@@ -10,10 +10,10 @@ export const categoriesColors: colorMapping = {
     Entertainment: "#6a4c93"
 }
 
-export const customCategoriesColors: colorMapping = {
-    first: '#FFAF45',
-    second: '#FB6D48',
-    third: '#D74B76',
-    fourth: '#673F69',
-    fifth: '#009990'
-}
+export const customCategoriesColor = [
+    '#FFAF45',
+    '#FB6D48',
+    '#D74B76',
+    '#673F69',
+    '#009990'
+]

@@ -5,8 +5,16 @@ const budgetSchema = new Schema({
     type: mongoose.Schema.Types.String,
     required: true
   },
-  amount: {
+  maxAmount: {
     type: mongoose.Schema.Types.Number,
+    required: true
+  },
+  currentAmount: {
+    type: mongoose.Schema.Types.Number,
+    required: true
+  },
+  date: {
+    type: mongoose.Schema.Types.String,
     required: true
   }
 });

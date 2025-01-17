@@ -4,3 +4,10 @@ export interface ExpenseType {
   amount: number,
   date: string
 }
+
+export interface BudgetType {
+  category: string
+  maxAmount: number,
+  currentAmount: number,
+  date: string
+}

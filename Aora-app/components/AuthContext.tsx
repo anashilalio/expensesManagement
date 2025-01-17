@@ -36,12 +36,14 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
             arr[expense.category] += expense.amount
             return arr
         }, {});
-        
-        categoriesTotal = Object.keys(categoriesTotal).map((category) => {
-            return {name: category, total: categoriesTotal[category]}
+
+        data.categories = data.categories.map((category: any) => {
+            return {
+                ...category,
+                total: categoriesTotal[category.name]
+            }
         })
 
-        data.CategoriesTotal = categoriesTotal
     }
 
     const loadUserData = async () => {
@@ -56,6 +58,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
             const sortedExpenses = data.expenses.sort((a:any, b:any) => new Date(b.date) - new Date(a.date));
             
             data.expenses = sortedExpenses
+            
             setUser(data)
             
             await AsyncStorage.setItem('@user', JSON.stringify(data))

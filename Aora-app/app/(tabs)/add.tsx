@@ -17,6 +17,8 @@ import { formatISO } from 'date-fns'
 import { useAuth } from '@/components/AuthContext';
 import { addCategoryToDB } from '@/api/category';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { defaultCategoriesNum } from '@/utils/constants';
+import { customCategoriesColor } from '@/utils/categoriesColors';
 
 const Add = () => {
 
@@ -30,13 +32,12 @@ const Add = () => {
   const [attachments, setAttachments] = useState<string[]>([]);
 
   const [categories, setCategories] = useState<any>([
-    {label:'',value:''}
+    { label: '', value: '' }
   ]);
 
   useEffect(() => {
-    console.log(user.categories);
     
-    const categoriesLabelValue = user.categories.map((category:any) => ({
+    const categoriesLabelValue = user.categories.map((category: any) => ({
       label: category.name,
       value: category.name
     }))
@@ -105,37 +106,41 @@ const Add = () => {
 
       expenseAddedNotif()
 
-      const updatedExpenses = [newExpense, ...user.expenses, ];
+      const updatedExpenses = [newExpense, ...user.expenses];
 
       const updatedTotalExpenses = user.totalExpenses + newExpense.amount
 
-      const updatedCategoriesTotal = [...user.CategoriesTotal];
+      const updatedCategories = [...user.categories];
 
-      const categoryIndex = updatedCategoriesTotal.findIndex((category) => category.name === newExpense.category);
+      const categoryIndex = updatedCategories.findIndex((category) => category.name === newExpense.category);
 
       if (categoryIndex !== -1) {
-        updatedCategoriesTotal[categoryIndex].total += newExpense.amount;
-      } else {
-        updatedCategoriesTotal.push({ name: newExpense.category, total: newExpense.amount });
+        updatedCategories[categoryIndex].total += newExpense.amount;
       }
 
       setUser({
         ...user,
         expenses: updatedExpenses,
         totalExpenses: updatedTotalExpenses,
-        CategoriesTotal: updatedCategoriesTotal
+        categories: updatedCategories
       })
 
     }
   }
 
   const addCategory = async () => {
-    const newCategory = await addCategoryToDB(newCategoryName)
-    if(newCategory){
+    const numberOfCategories = user.categories.reduce((sum: number, category: any) => ++sum, 0);
+    const index = numberOfCategories - defaultCategoriesNum
+    const color = customCategoriesColor[index];
+    const newCategory = await addCategoryToDB(newCategoryName, color)
+
+    if (newCategory) {
+      newCategory.total = 0
       setUser({
         ...user,
         categories: [...user.categories, newCategory]
       })
+      setShowNewCategoryModal(false)
     }
   }
 
@@ -160,7 +165,10 @@ const Add = () => {
               className="flex-1 text-white text-4xl ml-2"
               keyboardType="numeric"
               value={`${expense.amount}`}
-              onChangeText={(input) => setExpense({ ...expense, amount: parseFloat(input) })}
+              onChangeText={(input) => {
+                const amount = input ? parseFloat(input) : 0;
+                setExpense({ ...expense, amount: amount });
+              }}
               placeholder="0"
               placeholderTextColor="#ffffff88"
             />
@@ -282,7 +290,7 @@ const Add = () => {
             onPress={() => addExpense()}
           >
             <Text className="text-white text-center text-lg font-bold">
-              Add
+              Add expense
             </Text>
           </TouchableOpacity>
         </View>

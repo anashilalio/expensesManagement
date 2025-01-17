@@ -6,7 +6,7 @@ import { checkSchema } from 'express-validator'
 const router = Router()
 
 router.post(
-    "/api/addBudget",
+    "/api/budget/add",
     checkSchema(BudgetValidationSchema),
     async (request, response) => {
 

@@ -27,13 +27,19 @@ const Expense: React.FC<ExpenseProps> = ({ description, category, amount, date }
                 ? <IconComponent size={iconSize} />
                 : <DefaultIcon size={iconSize} name={category}/>
             )}
-            <View className="flex-row flex-1 items-center justify-between">
-                <View className="flex-col gap-1">
-                    <Text className="font-psemibold text-base text-title">
-                        {category}
-                    </Text>
-                    <Text className="font-plight text-sm text-subtitle">
+            <View className="flex-row flex-1 items-center justify-between gap-8">
+                <View className="flex-col gap-1 flex-shrink">
+                    <Text
+                        className="font-psemibold text-base text-title"
+                        numberOfLines={1}
+                    >
                         {expenseDescription}
+                    </Text>
+                    <Text
+                        className="font-plight text-sm text-subtitle"
+                        numberOfLines={1}
+                    >
+                        {category}
                     </Text>
                 </View>
                 <View className="flex-col gap-1">

@@ -17,7 +17,7 @@ export const formatDate = (dateIso: string) => {
   let hours = date.getHours()
   const minutes = String(date.getMinutes()).padStart(2, '0');
 
-  hours = hours % 12 || 12;
-  const ampm = hours >= 12 ? 'PM' : 'AM';
-  return `${month}/${day}/${year} ${hours}:${minutes} ${ampm}`;
+  // hours = hours % 12 || 12;
+  // const ampm = hours >= 12 ? 'PM' : 'AM';
+  return `${month}/${day} ${hours}:${minutes}`;
 }

@@ -1,4 +1,4 @@
-import { Text, View } from "react-native";
+import { LayoutChangeEvent, ScrollView, Text, View } from "react-native";
 import Svg from "react-native-svg";
 import PieChartSegment from "../PieChartSegment";
 import React, { useContext, useEffect, useMemo, useState } from "react";
@@ -37,7 +37,7 @@ const LowPartExpenses = () => {
     */
     const categoriesDetails = useMemo(() => {
         let angleStart = 0
-        const categoriesDetails = user.CategoriesTotal.map((category: any, index: number) => {
+        const categoriesDetails = user.categories.map((category: any, index: number) => {
             const percentage = category.total / user.totalExpenses;
             let angle = angleStart
             const segment = { ...category, angle, percentage }
@@ -46,8 +46,25 @@ const LowPartExpenses = () => {
         })
         return categoriesDetails
     },
-        [user.CategoriesTotal, user.totalExpenses]
+        [user.categories, user.totalExpenses]
     );
+
+    const categoriesFlexGap = 20
+
+    const [viewHeights, setViewHeights] = useState<number[]>([]);
+
+    const onLayout = (event: any, index: number) => {
+        const { height } = event.nativeEvent.layout;
+        if (index < 4) {
+            setViewHeights((prevHeights) => {
+                const newHeights = [...prevHeights];
+                newHeights[index] = height;
+                return newHeights.slice(0, 4); 
+            });
+        }
+    };
+
+    const maxHeight = viewHeights.reduce((sum, height) => sum + height + categoriesFlexGap, 0) - categoriesFlexGap;
 
     return (
         <View className="flex-row items-center gap-8">
@@ -74,23 +91,33 @@ const LowPartExpenses = () => {
                     })}
             </Svg>
 
-            <View className="flex-1 gap-5">
-                {user.CategoriesTotal.map((category: any, index: number) => {
-                    return (
-                        <View className="" key={index}>
-                            <View className="flex-row gap-2 items-center">
-                                <View className='w-3 h-6 rounded-md' style={{ backgroundColor: category.color }}></View>
-                                <Text className="text-black font-psemibold text-base">
-                                    {category.name}
+            <ScrollView
+                style={{maxHeight}}
+                nestedScrollEnabled={true}
+                showsVerticalScrollIndicator={false}
+            >
+                <View className="flex-1" style={{ gap: categoriesFlexGap }}>
+                    {user.categories.map((category: any, index: number) => {
+                        return (
+                            <View className="" key={index} onLayout={(event) => onLayout(event, index)}>
+                                <View className="flex-row gap-2 items-center">
+                                    <View className='w-3 h-6 rounded-md' style={{ backgroundColor: category.color }}></View>
+                                    <Text
+                                        className="text-black font-psemibold text-base flex-shrink"
+                                        numberOfLines={1}
+                                        ellipsizeMode="tail"
+                                    >
+                                        {category.name}
+                                    </Text>
+                                </View>
+                                <Text className="pl-5 text-gray-500 font-pmedium text-sm">
+                                    {formatAmount(category.total, currency)}
                                 </Text>
                             </View>
-                            <Text className="pl-5 text-gray-500 font-pmedium text-sm">
-                                {formatAmount(category.total, currency)}
-                            </Text>
-                        </View>
-                    )
-                })}
-            </View>
+                        )
+                    })}
+                </View>
+            </ScrollView>
         </View>
     )
 }
