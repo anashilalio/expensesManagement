@@ -25,8 +25,6 @@ const Add = () => {
   const { user, setUser } = useAuth()
 
   const [repeatTransaction, setRepeatTransaction] = useState(false);
-  const [budgetAmount, setBudgetAmount] = useState<string>('0');
-  const [selectedCategory, setSelectedCategory] = useState<string | undefined>(undefined);
   const [selectedWallet, setSelectedWallet] = useState<string | undefined>(undefined);
   const [showSuccess, setShowSucess] = useState(false);
   const [attachments, setAttachments] = useState<string[]>([]);
@@ -36,7 +34,7 @@ const Add = () => {
   ]);
 
   useEffect(() => {
-    
+
     const categoriesLabelValue = user.categories.map((category: any) => ({
       label: category.name,
       value: category.name
@@ -54,6 +52,7 @@ const Add = () => {
 
   const [showNewCategoryModal, setShowNewCategoryModal] = useState(false);
   const [newCategoryName, setNewCategoryName] = useState('');
+  const [showImageOptionsModal, setShowImageOptionsModal] = useState(false);
 
   const wallet = [
     { label: 'Paypal', value: 'Paypal' },
@@ -69,11 +68,15 @@ const Add = () => {
   }
 
   const handleDeleteImage = (index: number) => {
-    setAttachments((prev) => prev.filter((_, i) => i !== index));
+    setAttachments((prevAttachments) =>
+      prevAttachments.filter((_, i) => i !== index)
+    );
   };
 
-  const pickImages = async () => {
+  const pickFromGallery = async () => {
     try {
+      setShowImageOptionsModal(false);
+
       const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
       if (status !== 'granted') {
         alert('Sorry, we need camera roll permissions to make this work!');
@@ -92,7 +95,32 @@ const Add = () => {
         setAttachments((prev) => [...prev, ...pickedImages]);
       }
     } catch (error) {
-      console.log('Error picking images:', error);
+      console.log('Error picking images from gallery:', error);
+    }
+  };
+
+  const takePhoto = async () => {
+    try {
+      setShowImageOptionsModal(false);
+
+      const { status } = await ImagePicker.requestCameraPermissionsAsync();
+      if (status !== 'granted') {
+        alert('Sorry, we need camera permissions to make this work!');
+        return;
+      }
+
+      const result = await ImagePicker.launchCameraAsync({
+        base64: false,
+        quality: 1,
+      });
+
+      if (!result.canceled) {
+
+        const newPhotoUri = result.assets[0].uri;
+        setAttachments((prev) => [...prev, newPhotoUri]);
+      }
+    } catch (error) {
+      console.log('Error taking photo:', error);
     }
   };
 
@@ -111,12 +139,6 @@ const Add = () => {
       const updatedTotalExpenses = user.totalExpenses + newExpense.amount
 
       const updatedCategories = [...user.categories];
-
-      const categoryIndex = updatedCategories.findIndex((category) => category.name === newExpense.category);
-
-      if (categoryIndex !== -1) {
-        updatedCategories[categoryIndex].total += newExpense.amount;
-      }
 
       setUser({
         ...user,
@@ -143,17 +165,6 @@ const Add = () => {
       setShowNewCategoryModal(false)
     }
   }
-
-  const handleAddNewCategory = () => {
-    if (newCategoryName.trim()) {
-      setCategories((prev: any) => [
-        ...prev,
-        { label: newCategoryName, value: newCategoryName },
-      ]);
-      setNewCategoryName('');
-      setShowNewCategoryModal(false);
-    }
-  };
 
   return (
     <SafeAreaView className='h-full w-full bg-white'>
@@ -246,7 +257,7 @@ const Add = () => {
           <View className="mb-4">
             <TouchableOpacity
               className="border border-dashed border-gray-300 rounded-lg p-4 flex-row justify-center items-center"
-              onPress={pickImages}
+              onPress={() => setShowImageOptionsModal(true)}
             >
               <Text className="text-gray-500">📎 Add attachment</Text>
             </TouchableOpacity>
@@ -294,59 +305,90 @@ const Add = () => {
             </Text>
           </TouchableOpacity>
         </View>
-
-        <Modal
-          transparent
-          animationType="fade"
-          visible={showSuccess}
-          onRequestClose={() => setShowSucess(false)}
-        >
-          <View className="flex-1 justify-center items-center bg-black bg-opacity-50">
-            <View className="w-48 p-5 bg-white rounded-lg items-center">
-              <Text className="text-lg font-bold text-emerald-400 mb-2">Success!</Text>
-              <Text className="text-center text-gray-500">
-                Your transaction was added successfully.
-              </Text>
-            </View>
-          </View>
-        </Modal>
-
-        <Modal
-          transparent
-          animationType="slide"
-          visible={showNewCategoryModal}
-          onRequestClose={() => setShowNewCategoryModal(false)}
-        >
-          <View className="flex-1 justify-center items-center bg-black bg-opacity-50">
-            <View className="w-64 p-6 bg-white rounded-xl">
-              <Text className="text-lg font-semibold text-gray-700 mb-3">
-                Add New Category
-              </Text>
-              <TextInput
-                className="border border-gray-300 rounded-md p-2 mb-3"
-                placeholder="Category Name"
-                placeholderTextColor="#9CA3AF"
-                value={newCategoryName}
-                onChangeText={(input) => setNewCategoryName(input)}
-              />
-              <View className="flex-row justify-between">
-                <TouchableOpacity
-                  className="bg-gray-300 p-2 rounded-md"
-                  onPress={() => setShowNewCategoryModal(false)}
-                >
-                  <Text className="text-gray-700">Cancel</Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                  className="bg-violet p-2 rounded-md"
-                  onPress={() => addCategory()}
-                >
-                  <Text className="text-white">Add</Text>
-                </TouchableOpacity>
-              </View>
-            </View>
-          </View>
-        </Modal>
       </View>
+
+      <Modal
+        transparent
+        animationType="fade"
+        visible={showSuccess}
+        onRequestClose={() => setShowSucess(false)}
+      >
+        <View className="flex-1 justify-center items-center bg-black bg-opacity-50">
+          <View className="w-48 p-5 bg-white rounded-lg items-center">
+            <Text className="text-lg font-bold text-emerald-400 mb-2">Success!</Text>
+            <Text className="text-center text-gray-500">
+              Your transaction was added successfully.
+            </Text>
+          </View>
+        </View>
+      </Modal>
+
+      <Modal
+        transparent
+        animationType="slide"
+        visible={showNewCategoryModal}
+        onRequestClose={() => setShowNewCategoryModal(false)}
+      >
+        <View className="flex-1 justify-center items-center bg-black bg-opacity-50">
+          <View className="w-64 p-6 bg-white rounded-xl">
+            <Text className="text-lg font-semibold text-gray-700 mb-3">
+              Add New Category
+            </Text>
+            <TextInput
+              className="border border-gray-300 rounded-md p-2 mb-3"
+              placeholder="Category Name"
+              placeholderTextColor="#9CA3AF"
+              value={newCategoryName}
+              onChangeText={(input) => setNewCategoryName(input)}
+            />
+            <View className="flex-row justify-between">
+              <TouchableOpacity
+                className="bg-gray-300 p-2 rounded-md"
+                onPress={() => setShowNewCategoryModal(false)}
+              >
+                <Text className="text-gray-700">Cancel</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                className="bg-violet p-2 rounded-md"
+                onPress={() => addCategory()}
+              >
+                <Text className="text-white">Add</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
+
+      <Modal
+        transparent
+        animationType="fade"
+        visible={showImageOptionsModal}
+        onRequestClose={() => setShowImageOptionsModal(false)}
+      >
+        <View className="flex-1 justify-center items-center bg-black bg-opacity-50">
+          <View className="w-64 p-6 bg-white rounded-xl">
+            <Text className="text-lg font-semibold text-gray-700 mb-3">Add Attachment</Text>
+
+            <TouchableOpacity
+              className="bg-gray-300 p-3 rounded-md mb-3"
+              onPress={pickFromGallery}
+            >
+              <Text className="text-center text-gray-700">Pick from Gallery</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity className="bg-gray-300 p-3 rounded-md" onPress={takePhoto}>
+              <Text className="text-center text-gray-700">Take a Photo</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              className="mt-4 p-2 rounded-md items-center"
+              onPress={() => setShowImageOptionsModal(false)}
+            >
+              <Text className="text-gray-500">Cancel</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
     </SafeAreaView>
   );
 };

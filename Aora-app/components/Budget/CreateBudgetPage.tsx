@@ -16,8 +16,16 @@ const CreateBudgetPage: React.FC<CreateBudgetPageProps> = ({ onBack }) => {
 
   const { user, setUser } = useAuth()
 
-  const categories = useMemo(() => {
-    return user.categories.map((category: any) => category.name)
+  const [categories, setCategories] = useState<any>([
+    { label: '', value: '' }
+  ]);
+
+  useEffect(() => {
+    const categoriesLabelValue = user.categories.map((category: any) => ({
+      label: category.name,
+      value: category.name
+    }))
+    setCategories(categoriesLabelValue)
   }, [user.categories])
 
   const [budget, setBudget] = useState<BudgetType>({
@@ -29,7 +37,6 @@ const CreateBudgetPage: React.FC<CreateBudgetPageProps> = ({ onBack }) => {
 
   const [receiveAlert, setReceiveAlert] = useState(false);
   const [alertPercentage, setAlertPercentage] = useState<number>(80);
-  const [budgetAmount, setBudgetAmount] = useState<string>('0');
 
   const handleSliderChange = useCallback(
     debounce((value: number) => {
