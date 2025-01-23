@@ -7,6 +7,7 @@ import Plan from '../assets/images/plan.png'
 import { Link, router } from 'expo-router';
 import '../global.css';
 import { StatusBar } from 'expo-status-bar';
+import React from 'react';
 
 export default function HomeScreen() {
   return (
@@ -62,13 +63,7 @@ export default function HomeScreen() {
           >
             <Text style={[styles.buttonTextLogIn, styles.buttonText]}>Login</Text>
           </TouchableOpacity>
-          <TouchableOpacity
-            style={styles.button}
-            activeOpacity={0.6}
-            onPress={() => {router.push('/(tabs)/home')}}
-          >
-            <Text style={[styles.buttonTextLogIn, styles.buttonText]}>Home</Text>
-          </TouchableOpacity>
+          
         </View>
 
       </View>

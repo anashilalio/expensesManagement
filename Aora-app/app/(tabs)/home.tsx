@@ -9,6 +9,7 @@ import Financials from '@/components/Home/Financials'
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import FontAwesome6 from '@expo/vector-icons/FontAwesome6';
 import { useAuth } from '@/components/AuthContext'
+import Community from '@/components/community/Community'
 
 interface CurrencyContextType {
   currency: string
@@ -19,7 +20,7 @@ export const CurrencyContext = createContext<CurrencyContextType>({
 })
 
 const Home = () => {
-
+  const [showCommunity , setShowCommunity ] = useState(false);
   const { user, setUser } = useAuth()
 
   const [currency, setcurrency] = useState("dollar")
@@ -39,6 +40,9 @@ const Home = () => {
   const handlePreviousMonth = () => {
     setCurrentMonthIndex((prev) => (prev - 1 + 12) % 12);
   };
+  if(showCommunity){
+    return <Community onBack={()=> setShowCommunity(false)} />
+  }
   return (
     <SafeAreaView className='h-full w-full bg-white '>
       <ScrollView>
@@ -53,7 +57,7 @@ const Home = () => {
                 <TouchableOpacity className="p-4  border-black">
                   <Text className="text-black text-xl">Profile</Text>
                 </TouchableOpacity>
-                <TouchableOpacity className="p-4  border-black">
+                <TouchableOpacity className="p-4  border-black" onPress={()=>setShowCommunity(true)}>
                   <Text className="text-black text-xl">Community</Text>
                 </TouchableOpacity>
                 <TouchableOpacity className="p-4  border-black">
