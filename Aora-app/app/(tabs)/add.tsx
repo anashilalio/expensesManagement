@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react'
 import {
   View,
   Text,
@@ -8,79 +8,149 @@ import {
   Image,
   ScrollView,
   Modal,
-} from 'react-native';
-import RNPickerSelect from 'react-native-picker-select';
-import * as ImagePicker from 'expo-image-picker';
-import { addExpenseToDB } from '@/api/expense';
-import { ExpenseType } from '@/types/types';
+} from 'react-native'
+import RNPickerSelect from 'react-native-picker-select'
+import * as ImagePicker from 'expo-image-picker'
+import { CommunityExpenseType, ExpenseType } from '@/types/types'
 import { formatISO } from 'date-fns'
-import { useAuth } from '@/components/AuthContext';
-import { addCategoryToDB } from '@/api/category';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { defaultCategoriesNum } from '@/utils/constants';
-import { customCategoriesColor } from '@/utils/categoriesColors';
+import { useAuth } from '@/components/AuthContext'
+import { addPersonalCategoryToDB, addCommunityCategoryToDB } from '@/api/category'
+import { SafeAreaView } from 'react-native-safe-area-context'
+import { defaultCategoriesNum } from '@/utils/constants'
+import { customCategoriesColor } from '@/utils/categoriesColors'
+import { addCommunityExpenseToDB, addPersonalExpenseToDB } from '@/api/expense'
 
 const Add = () => {
 
   const { user, setUser } = useAuth()
 
-  const [repeatTransaction, setRepeatTransaction] = useState(false);
-  const [selectedWallet, setSelectedWallet] = useState<string | undefined>(undefined);
-  const [showSuccess, setShowSucess] = useState(false);
-  const [attachments, setAttachments] = useState<string[]>([]);
+  const [repeatTransaction, setRepeatTransaction] = useState(false)
+  const [selectedWallet, setSelectedWallet] = useState<string | undefined>(undefined)
+  const [showSuccess, setShowSucess] = useState(false)
+  const [attachments, setAttachments] = useState<string[]>([])
 
-  const [categories, setCategories] = useState<any>([
+  const [personalCategories, setPersonalCategories] = useState([
+    { label: '', value: '', parent: '' }
+  ])
+  const [communitiesCategories, setCommunitiesCategories] = useState([
     { label: '', value: '' }
-  ]);
+  ])
+  const [categories, setCategories] = useState<any>('')
 
   useEffect(() => {
 
-    const categoriesLabelValue = user.categories.map((category: any) => ({
+    const personalCategoriesLabelValue = user.categories.map((category: any) => ({
+      label: category.name,
+      value: category.name,
+      parent: 'personal-categories'
+    }))
+
+    setPersonalCategories([{
+      label: 'Personal',
+      value: 'personal',
+      key: 'personal-categories',
+      inputLabel: 'Personal',
+      color: 'gray'
+    },
+    ...personalCategoriesLabelValue])
+  }, [user.categories])
+
+  useEffect(() => {
+
+    const tmp = user.communitiesCategories.reduce((acc: any, communityCateg: any) => {
+      if (!acc[communityCateg.communityCode]) {
+        acc[communityCateg.communityCode] = []
+      }
+      acc[communityCateg.communityCode].push(communityCateg.name)
+      return acc
+    }, {})
+
+    const array = Object.keys(tmp).map((key) => ({ communityCode: key, names: tmp[key] }))
+
+    const updatedArray = array.map(item => {
+      const communi = user.communities.find((c: any) => c.code === item.communityCode)
+      return {
+        ...item,
+        community: communi ? communi.name : item.communityCode,
+        code: item.communityCode
+      }
+    })
+
+    const communitiesCategoriesLabelValue = updatedArray.flatMap(({ community, code, names }) => [
+      {
+        label: community,
+        value: community,
+        key: `${community}-section`,
+        inputLabel: community,
+        color: 'gray',
+      },
+      ...names.map((name: string) => ({
+        label: name,
+        value: { item: name, parent: code },
+        parent: `${community}-section`
+      }))
+    ])
+
+    setCommunitiesCategories(communitiesCategoriesLabelValue)
+  }, [user.communitiesCategories])
+
+  useEffect(() => {
+    setCategories([...personalCategories, ...communitiesCategories])
+  }, [personalCategories, communitiesCategories])
+
+  const [target, setTarget] = useState('')
+  const [targets, setTargets] = useState([
+    { label: '', value: '' }
+  ])
+
+  useEffect(() => {
+    const targetsLabelValue = user.communities.map((category: any) => ({
       label: category.name,
       value: category.name
     }))
 
-    setCategories(categoriesLabelValue)
-  }, [user.categories])
+    setTargets([{ label: 'Personal', value: 'Personal' }, ...targetsLabelValue])
+  }, [user.communities])
 
-  const [expense, setExpense] = useState<ExpenseType>({
+  const [expense, setExpense] = useState<CommunityExpenseType>({
+    communityCode: '',
     category: '',
     description: '',
     amount: 0,
     date: ''
   })
 
-  const [showNewCategoryModal, setShowNewCategoryModal] = useState(false);
-  const [newCategoryName, setNewCategoryName] = useState('');
-  const [showImageOptionsModal, setShowImageOptionsModal] = useState(false);
+  const [showNewCategoryModal, setShowNewCategoryModal] = useState(false)
+  const [newCategoryName, setNewCategoryName] = useState('')
+  const [showImageOptionsModal, setShowImageOptionsModal] = useState(false)
 
   const wallet = [
     { label: 'Paypal', value: 'Paypal' },
     { label: 'CIH', value: 'CIH' },
     { label: 'BqChaabi', value: 'BqChaabi' },
-  ];
+  ]
 
   const expenseAddedNotif = () => {
-    setShowSucess(true);
+    setShowSucess(true)
     setTimeout(() => {
-      setShowSucess(false);
+      setShowSucess(false)
     }, 3000)
   }
 
   const handleDeleteImage = (index: number) => {
     setAttachments((prevAttachments) =>
       prevAttachments.filter((_, i) => i !== index)
-    );
-  };
+    )
+  }
 
   const pickFromGallery = async () => {
     try {
-      setShowImageOptionsModal(false);
+      setShowImageOptionsModal(false)
 
-      const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+      const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync()
       if (status !== 'granted') {
-        alert('Sorry, we need camera roll permissions to make this work!');
-        return;
+        alert('Sorry, we need camera roll permissions to make this work!')
+        return
       }
 
       const result = await ImagePicker.launchImageLibraryAsync({
@@ -88,81 +158,145 @@ const Add = () => {
         allowsMultipleSelection: true,
         base64: false,
         quality: 1,
-      });
+      })
 
       if (!result.canceled) {
-        const pickedImages = result.assets.map((asset) => asset.uri);
-        setAttachments((prev) => [...prev, ...pickedImages]);
+        const pickedImages = result.assets.map((asset) => asset.uri)
+        setAttachments((prev) => [...prev, ...pickedImages])
       }
     } catch (error) {
-      console.log('Error picking images from gallery:', error);
+      console.log('Error picking images from gallery:', error)
     }
-  };
+  }
 
   const takePhoto = async () => {
     try {
-      setShowImageOptionsModal(false);
+      setShowImageOptionsModal(false)
 
-      const { status } = await ImagePicker.requestCameraPermissionsAsync();
+      const { status } = await ImagePicker.requestCameraPermissionsAsync()
       if (status !== 'granted') {
-        alert('Sorry, we need camera permissions to make this work!');
-        return;
+        alert('Sorry, we need camera permissions to make this work!')
+        return
       }
 
       const result = await ImagePicker.launchCameraAsync({
         base64: false,
         quality: 1,
-      });
+      })
 
       if (!result.canceled) {
 
-        const newPhotoUri = result.assets[0].uri;
-        setAttachments((prev) => [...prev, newPhotoUri]);
+        const newPhotoUri = result.assets[0].uri
+        setAttachments((prev) => [...prev, newPhotoUri])
       }
     } catch (error) {
-      console.log('Error taking photo:', error);
+      console.log('Error taking photo:', error)
     }
-  };
+  }
 
   const addExpense = async () => {
 
     let date = formatISO(new Date())
     setExpense({ ...expense, date: date })
-    const newExpense = await addExpenseToDB(expense)
 
-    if (newExpense) {
+    if (expense.communityCode === '') {
 
-      expenseAddedNotif()
+      const personalExpense: ExpenseType = {
+        category: expense.category,
+        description: expense.description,
+        amount: expense.amount,
+        date: expense.date
+      }
 
-      const updatedExpenses = [newExpense, ...user.expenses];
+      const newExpense = await addPersonalExpenseToDB(personalExpense)
 
-      const updatedTotalExpenses = user.totalExpenses + newExpense.amount
+      if (newExpense) {
 
-      const updatedCategories = [...user.categories];
+        expenseAddedNotif()
 
-      setUser({
-        ...user,
-        expenses: updatedExpenses,
-        totalExpenses: updatedTotalExpenses,
-        categories: updatedCategories
-      })
+        const updatedExpenses = [newExpense, ...user.expenses]
 
+        const updatedTotalPersonalExpenses = user.totalPersonalExpenses + newExpense.amount
+
+        const updatedCategories = user.categories.map((category: any) => {
+          if (category.name === newExpense.category) {
+            category.total += newExpense.amount
+          }
+          return category
+        })
+
+        setUser({
+          ...user,
+          expenses: updatedExpenses,
+          totalPersonalExpenses: updatedTotalPersonalExpenses,
+          categories: updatedCategories
+        })
+
+      }
+
+    } else {
+
+      const newExpense = await addCommunityExpenseToDB(expense)
+      console.log(newExpense);
+      
+      if (newExpense) {
+
+        expenseAddedNotif()
+
+        const updatedCommunitiesExpenses = [newExpense, ...user.communitiesExpenses]
+
+        const updatedCommunitiesCategories = user.communitiesCategories.map((category: any) => {
+          if (category.name === newExpense.category && category.communityCode === newExpense.communityCode) {
+            category.total += newExpense.amount
+          }
+          return category
+        })
+
+        setUser({
+          ...user,
+          communitiesExpenses: updatedCommunitiesExpenses,
+          communitiesCategories: updatedCommunitiesCategories
+        })
+        console.log(user);
+        
+      }
     }
+
   }
 
   const addCategory = async () => {
-    const numberOfCategories = user.categories.reduce((sum: number, category: any) => ++sum, 0);
+    const numberOfCategories = user.categories.reduce((sum: number, category: any) => ++sum, 0)
     const index = numberOfCategories - defaultCategoriesNum
-    const color = customCategoriesColor[index];
-    const newCategory = await addCategoryToDB(newCategoryName, color)
+    const color = customCategoriesColor[index]
 
-    if (newCategory) {
-      newCategory.total = 0
-      setUser({
-        ...user,
-        categories: [...user.categories, newCategory]
-      })
-      setShowNewCategoryModal(false)
+    if (target === 'Personal') {
+      const newCategory = await addPersonalCategoryToDB(newCategoryName, color)
+
+      if (newCategory) {
+        newCategory.total = 0
+        setUser({
+          ...user,
+          categories: [...user.categories, newCategory]
+        })
+        setShowNewCategoryModal(false)
+      }
+    } else {
+      const communityCode = user.communities.find((community: any) => community.name === target).code
+      console.log(communityCode)
+
+      const newCategory = await addCommunityCategoryToDB(communityCode, newCategoryName, color)
+      console.log(newCategory)
+
+      if (newCategory) {
+        newCategory.total = 0
+        setUser({
+          ...user,
+          communitiesCategories: [...user.communitiesCategories, newCategory]
+        })
+        setShowNewCategoryModal(false)
+        console.log(user)
+
+      }
     }
   }
 
@@ -177,8 +311,8 @@ const Add = () => {
               keyboardType="numeric"
               value={`${expense.amount}`}
               onChangeText={(input) => {
-                const amount = input ? parseFloat(input) : 0;
-                setExpense({ ...expense, amount: amount });
+                const amount = input ? parseFloat(input) : 0
+                setExpense({ ...expense, amount: amount })
               }}
               placeholder="0"
               placeholderTextColor="#ffffff88"
@@ -199,25 +333,36 @@ const Add = () => {
           </View>
 
           <View className="mb-4">
-            <RNPickerSelect
-              onValueChange={(input) => setExpense({ ...expense, category: input })}
-              items={categories}
-              placeholder={{
-                label: 'Select a Category',
-                value: null,
-                color: '#9CA3AF',
-              }}
-              style={{
-                inputAndroid: {
-                  backgroundColor: '#FFFFFF',
-                  borderRadius: 8,
-                  borderColor: '#E5E7EB',
-                  borderWidth: 1,
-                  padding: 12,
-                  color: '#6B7280',
-                },
-              }}
-            />
+            {categories.length > 0 ?
+              (<RNPickerSelect
+                onValueChange={(input) => {
+                  if (input) {
+                    if (typeof input === "object")
+                      setExpense({ ...expense, category: input.item, communityCode: input.parent })
+                    else
+                      setExpense({ ...expense, category: input, communityCode: '' })
+                  }
+                }}
+                items={categories}
+                placeholder={{
+                  label: 'Select a Category',
+                  value: null,
+                  color: '#9CA3AF',
+                }}
+                style={{
+                  inputAndroid: {
+                    backgroundColor: '#FFFFFF',
+                    borderRadius: 8,
+                    borderColor: '#E5E7EB',
+                    borderWidth: 1,
+                    padding: 12,
+                    color: '#6B7280',
+                  },
+                }}
+              />
+              ) : (
+                <Text>Loading categories...</Text>
+              )}
           </View>
 
           <View className="mb-4">
@@ -334,6 +479,27 @@ const Add = () => {
             <Text className="text-lg font-semibold text-gray-700 mb-3">
               Add New Category
             </Text>
+            <View>
+              <RNPickerSelect
+                onValueChange={(input) => setTarget(input)}
+                items={targets}
+                placeholder={{
+                  label: 'Select a Category',
+                  value: null,
+                  color: '#9CA3AF',
+                }}
+                style={{
+                  inputAndroid: {
+                    backgroundColor: '#FFFFFF',
+                    borderRadius: 8,
+                    borderColor: '#E5E7EB',
+                    borderWidth: 1,
+                    padding: 12,
+                    color: '#6B7280',
+                  },
+                }}
+              />
+            </View>
             <TextInput
               className="border border-gray-300 rounded-md p-2 mb-3"
               placeholder="Category Name"
@@ -390,7 +556,7 @@ const Add = () => {
         </View>
       </Modal>
     </SafeAreaView>
-  );
-};
+  )
+}
 
-export default Add;
+export default Add

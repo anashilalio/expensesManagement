@@ -6,15 +6,11 @@ import tinycolor from 'tinycolor2'
 interface DefaultIconProps {
     size: number
     name: string
+    color: string
 }
-const DefaultIcon: React.FC<DefaultIconProps> = ({ size, name }) => {
+const DefaultIcon: React.FC<DefaultIconProps> = ({ size, name, color }) => {
 
     const { user } = useAuth()
-
-    const color = useMemo(() => {
-        const category = user.categories.find((category: any) => category.name === name);
-        return category.color
-    }, [user.categories]);
 
     const backgroundColor = useMemo(() => { 
         return tinycolor(color).lighten(30).toString();

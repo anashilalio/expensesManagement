@@ -10,9 +10,10 @@ interface ExpenseProps {
     category: string,
     amount: number,
     date: string
+    color: string
 }
 
-const Expense: React.FC<ExpenseProps> = ({ description, category, amount, date }) => {
+const Expense: React.FC<ExpenseProps> = ({ description, category, amount, date, color }) => {
 
     const { currency } = useContext(CurrencyContext)
 
@@ -25,7 +26,7 @@ const Expense: React.FC<ExpenseProps> = ({ description, category, amount, date }
             {(   
                 IconComponent
                 ? <IconComponent size={iconSize} />
-                : <DefaultIcon size={iconSize} name={category}/>
+                : <DefaultIcon size={iconSize} name={category} color={color}/>
             )}
             <View className="flex-row flex-1 items-center justify-between gap-8">
                 <View className="flex-col gap-1 flex-shrink">

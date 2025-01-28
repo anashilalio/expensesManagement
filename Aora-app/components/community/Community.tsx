@@ -14,10 +14,10 @@ interface CommunityProps {
 
 const Community: React.FC<CommunityProps> = ({ onBack }) => {
   const [communityCode, setCommunityCode] = useState('');
-    const [createCommunity , setCreateCommunity ] = useState(false);
-    if(createCommunity){
-        return <AddCommunity onBack={()=>setCreateCommunity(false)}/>
-    }
+  const [createCommunity, setCreateCommunity] = useState(false);
+  if (createCommunity) {
+    return <AddCommunity onBack={() => setCreateCommunity(false)} />
+  }
   return (
     <SafeAreaProvider>
       <SafeAreaView className="flex-1 bg-gray-50 px-4 py-4">
@@ -52,7 +52,7 @@ const Community: React.FC<CommunityProps> = ({ onBack }) => {
           </View>
         </View>
 
-        <TouchableOpacity className="mt-auto bg-violet rounded-lg py-4" onPress={()=>setCreateCommunity(true)}>
+        <TouchableOpacity className="mt-auto bg-violet rounded-lg py-4" onPress={() => setCreateCommunity(true)}>
           <Text className="text-center text-white font-semibold text-base">
             Create New Community
           </Text>

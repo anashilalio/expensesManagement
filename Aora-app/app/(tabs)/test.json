@@ -1,0 +1,356 @@
+{
+    "budgets": [],
+    "categories": [
+        {
+            "_id": "678181d9fa1721b0d87a29c1",
+            "color": "#8ac926",
+            "name": "Food",
+            "total": 153,
+            "userId": null
+        },
+        {
+            "_id": "6781821efa1721b0d87a29c2",
+            "color": "#1982c4",
+            "name": "Transport",
+            "total": 194,
+            "userId": null
+        },
+        {
+            "_id": "67818240fa1721b0d87a29c3",
+            "color": "#ff595e",
+            "name": "Shopping",
+            "total": 266,
+            "userId": null
+        },
+        {
+            "_id": "67818255fa1721b0d87a29c4",
+            "color": "#6a4c93",
+            "name": "Entertainment",
+            "total": 133,
+            "userId": null
+        },
+        {
+            "__v": 0,
+            "_id": "678ab13ecca0c05eeabfadbe",
+            "color": "#FFAF45",
+            "name": "Bills",
+            "total": 57,
+            "userId": "6781abdde13d4a34a80c38aa"
+        },
+        {
+            "__v": 0,
+            "_id": "678d735e0aa8b86f25a5cdca",
+            "color": "#D74B76",
+            "name": "Health",
+            "total": 693,
+            "userId": "6781abdde13d4a34a80c38aa"
+        },
+        {
+            "__v": 0,
+            "_id": "6797938073dea16ec29d3b20",
+            "color": "#D74B76",
+            "name": "Yyy",
+            "total": 22,
+            "userId": "6781abdde13d4a34a80c38aa"
+        }
+    ],
+    "communities": [
+        {
+            "__v": 0,
+            "_id": "6797878b93f8069dc46d8925",
+            "code": "b61421a4-0e8b-46fe-8e42-d83c909b673f",
+            "creatorId": "6781abdde13d4a34a80c38aa",
+            "date": "2025-01-27T13:18:03.414Z",
+            "description": "House expenses",
+            "members": [Array
+            ],
+            "name": "HouseHold",
+            "total": 0
+        },
+        {
+            "__v": 0,
+            "_id": "67979c031f6b3d83a7c84f97",
+            "code": "00a8dda3-f639-4162-8bf7-ea01150ab2f5",
+            "creatorId": "6781abdde13d4a34a80c38aa",
+            "date": "2025-01-27T14:45:23.297Z",
+            "description": "Ttt",
+            "members": [Array
+            ],
+            "name": "Parties",
+            "total": 1300
+        }
+    ],
+    "communitiesCategories": [
+        {
+            "__v": 0,
+            "_id": "679796c81f6b3d83a7c84f82",
+            "color": "#673F69",
+            "communityCode": "b61421a4-0e8b-46fe-8e42-d83c909b673f",
+            "name": "5tryy",
+            "total": 0
+        },
+        {
+            "__v": 0,
+            "_id": "67979c0e1f6b3d83a7c84f9a",
+            "color": "#673F69",
+            "communityCode": "00a8dda3-f639-4162-8bf7-ea01150ab2f5",
+            "name": "Ppopop",
+            "total": 1300
+        },
+        {
+            "__v": 0,
+            "_id": "67979c1a1f6b3d83a7c84f9d",
+            "color": "#673F69",
+            "communityCode": "00a8dda3-f639-4162-8bf7-ea01150ab2f5",
+            "name": "Qqqwq",
+            "total": 0
+        },
+        {
+            "__v": 0,
+            "_id": "6797dbbfc98354801215771f",
+            "color": "#673F69",
+            "communityCode": "b61421a4-0e8b-46fe-8e42-d83c909b673f",
+            "name": "Yyyyyvvvvvv",
+            "total": 0
+        }
+    ],
+    "communitiesExpenses": [
+        {
+            "__v": 0,
+            "_id": "67980a03e8c5456fb965898c",
+            "amount": 300,
+            "category": "Ppopop",
+            "communityCode": "00a8dda3-f639-4162-8bf7-ea01150ab2f5",
+            "date": "2025-01-27T23:34:03+01:00",
+            "description": "Tttt"
+        },
+        {
+            "__v": 0,
+            "_id": "67980c92e8c5456fb96589d1",
+            "amount": 1000,
+            "category": "Ppopop",
+            "communityCode": "00a8dda3-f639-4162-8bf7-ea01150ab2f5",
+            "date": "2025-01-27T23:45:34+01:00",
+            "description": "Tttt"
+        }
+    ],
+    "expenses": [
+        {
+            "__v": 0,
+            "_id": "67980855c9835480121578c2",
+            "amount": 333,
+            "category": "Health",
+            "date": "2025-01-27T23:27:30+01:00",
+            "description": "Rty",
+            "userId": "6781abdde13d4a34a80c38aa"
+        },
+        {
+            "__v": 0,
+            "_id": "67980014c983548012157858",
+            "amount": 8,
+            "category": "Bills",
+            "date": "2025-01-27T22:52:19+01:00",
+            "description": "Tt",
+            "userId": "6781abdde13d4a34a80c38aa"
+        },
+        {
+            "__v": 0,
+            "_id": "6797938c73dea16ec29d3b24",
+            "amount": 22,
+            "category": "Yyy",
+            "date": "2025-01-27T15:09:16+01:00",
+            "description": "Rrr",
+            "userId": "6781abdde13d4a34a80c38aa"
+        },
+        {
+            "__v": 0,
+            "_id": "6796b121b8f89b24d90c1b82",
+            "amount": 5,
+            "category": "Transport",
+            "date": "2025-01-26T23:03:10+01:00",
+            "description": "Bus",
+            "userId": "6781abdde13d4a34a80c38aa"
+        },
+        {
+            "__v": 0,
+            "_id": "679579d097d383a6cb3ad616",
+            "amount": 100,
+            "category": "Health",
+            "date": "2025-01-26T00:54:55+01:00",
+            "description": "Medicine",
+            "userId": "6781abdde13d4a34a80c38aa"
+        },
+        {
+            "__v": 0,
+            "_id": "6795795297d383a6cb3ad60c",
+            "amount": 10,
+            "category": "Food",
+            "date": "2025-01-26T00:52:46+01:00",
+            "description": "Burger",
+            "userId": "6781abdde13d4a34a80c38aa"
+        },
+        {
+            "__v": 0,
+            "_id": "6795790097d383a6cb3ad602",
+            "amount": 5,
+            "category": "Transport",
+            "date": "2025-01-26T00:51:27+01:00",
+            "description": "Bus",
+            "userId": "6781abdde13d4a34a80c38aa"
+        },
+        {
+            "__v": 0,
+            "_id": "6795780797d383a6cb3ad5f5",
+            "amount": 84,
+            "category": "Food",
+            "date": "2025-01-26T00:47:17+01:00",
+            "description": "Restaurant dinner",
+            "userId": "6781abdde13d4a34a80c38aa"
+        },
+        {
+            "__v": 0,
+            "_id": "6795760397d383a6cb3ad5eb",
+            "amount": 40,
+            "category": "Entertainment",
+            "date": "2025-01-26T00:37:31+01:00",
+            "description": "Rent movie",
+            "userId": "6781abdde13d4a34a80c38aa"
+        },
+        {
+            "__v": 0,
+            "_id": "679575b997d383a6cb3ad5e8",
+            "amount": 45,
+            "category": "Entertainment",
+            "date": "2025-01-26T00:37:28+01:00",
+            "description": "Karting",
+            "userId": "6781abdde13d4a34a80c38aa"
+        },
+        {
+            "__v": 0,
+            "_id": "678da82d5a53f15d2938c927",
+            "amount": 30,
+            "category": "Shopping",
+            "date": "2025-01-20T02:34:37+01:00",
+            "description": "Groceries",
+            "userId": "6781abdde13d4a34a80c38aa"
+        },
+        {
+            "__v": 0,
+            "_id": "678d73710aa8b86f25a5cdce",
+            "amount": 260,
+            "category": "Health",
+            "date": "2025-01-19T22:49:36+01:00",
+            "description": "Pharmacy",
+            "userId": "6781abdde13d4a34a80c38aa"
+        },
+        {
+            "__v": 0,
+            "_id": "678ab164cca0c05eeabfadc2",
+            "amount": 49,
+            "category": "Bills",
+            "date": "2025-01-17T20:37:02+01:00",
+            "description": "Water + electricity",
+            "userId": "6781abdde13d4a34a80c38aa"
+        },
+        {
+            "__v": 0,
+            "_id": "67882d50eface5eef8239904",
+            "amount": 16,
+            "category": "Food",
+            "date": "2025-01-15T22:48:52+01:00",
+            "description": "Chicken",
+            "userId": "6781abdde13d4a34a80c38aa"
+        },
+        {
+            "__v": 0,
+            "_id": "678825cbedbe3796f7442a42",
+            "amount": 80,
+            "category": "Shopping",
+            "date": "2025-01-15T22:16:49+01:00",
+            "description": "Groceries",
+            "userId": "6781abdde13d4a34a80c38aa"
+        },
+        {
+            "__v": 0,
+            "_id": "6788248fedbe3796f7442a35",
+            "amount": 20,
+            "category": "Transport",
+            "date": "2025-01-15T22:11:41+01:00",
+            "description": "Bus",
+            "userId": "6781abdde13d4a34a80c38aa"
+        },
+        {
+            "__v": 0,
+            "_id": "678706cfdaf73ab22eeead42",
+            "amount": 9,
+            "category": "Transport",
+            "date": "2025-01-15T01:52:31+01:00",
+            "description": "Bus",
+            "userId": "6781abdde13d4a34a80c38aa"
+        },
+        {
+            "__v": 0,
+            "_id": "6786f5c8869eeb85dc8c4d7b",
+            "amount": 33,
+            "category": "Entertainment",
+            "date": "2025-01-15T00:39:47+01:00",
+            "description": "Cinema",
+            "userId": "6781abdde13d4a34a80c38aa"
+        },
+        {
+            "__v": 0,
+            "_id": "6786f1a057bc3fb1b413bc7e",
+            "amount": 33,
+            "category": "Food",
+            "date": "2025-01-15T00:21:53+01:00",
+            "description": "Lunch",
+            "userId": "6781abdde13d4a34a80c38aa"
+        },
+        {
+            "__v": 0,
+            "_id": "6786ed5a57bc3fb1b413bc6e",
+            "amount": 55,
+            "category": "Transport",
+            "date": "2025-01-15T00:03:20+01:00",
+            "description": "Ctm",
+            "userId": "6781abdde13d4a34a80c38aa"
+        },
+        {
+            "__v": 0,
+            "_id": "6781ae8c0f58809399a0f7cf",
+            "amount": 156,
+            "category": "Shopping",
+            "date": "2025-01-11T00:33:56+01:00",
+            "description": "Groceries",
+            "userId": "6781abdde13d4a34a80c38aa"
+        },
+        {
+            "__v": 0,
+            "_id": "6781ae6441d3cd62f2c465a9",
+            "amount": 15,
+            "category": "Entertainment",
+            "date": "2025-01-11T00:33:39+01:00",
+            "description": "Movie",
+            "userId": "6781abdde13d4a34a80c38aa"
+        },
+        {
+            "__v": 0,
+            "_id": "6781ae5341d3cd62f2c465a6",
+            "amount": 10,
+            "category": "Food",
+            "date": "2025-01-11T00:33:20+01:00",
+            "description": "Sandwich",
+            "userId": "6781abdde13d4a34a80c38aa"
+        },
+        {
+            "__v": 0,
+            "_id": "6781ae4041d3cd62f2c465a3",
+            "amount": 100,
+            "category": "Transport",
+            "date": "2025-01-11T00:32:54+01:00",
+            "description": "Airplane",
+            "userId": "6781abdde13d4a34a80c38aa"
+        }
+    ],
+    "totalPersonalExpenses": 1518
+}

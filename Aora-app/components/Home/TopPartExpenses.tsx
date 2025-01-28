@@ -1,17 +1,13 @@
 import React, { useContext } from "react"
 import { Text, View } from "react-native"
 import { CurrencyContext } from "@/app/(tabs)/home"
-import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons'
 import { formatAmount } from "../../utils/format"
-import { useAuth } from "../AuthContext"
 
-const TopPartExpenses = () => {
+const TopPartExpenses : React.FC<{totalExpenses: number}> = ({totalExpenses}) => {
 
     const { currency } = useContext(CurrencyContext)
 
     const monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
-
-    const { user, setUser } = useAuth();
 
     const currentDate = new Date()
     const firstDayOfMonth = new Date()
@@ -24,7 +20,6 @@ const TopPartExpenses = () => {
         let year = date.getFullYear()
         return `${day} ${monthStr} ${year}`
     }
-
 
     return (
         <View className="flex-row justify-between">
@@ -39,7 +34,7 @@ const TopPartExpenses = () => {
             </View>
 
             <Text className="font-psemibold text-xl text-tomato-primary">
-                {formatAmount(user.totalExpenses, currency)}
+                {formatAmount(totalExpenses, currency)}
             </Text>
 
         </View>

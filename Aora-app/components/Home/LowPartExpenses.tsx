@@ -7,11 +7,13 @@ import { useSharedValue, withTiming } from "react-native-reanimated";
 import { formatAmount } from "../../utils/format"
 import { useAuth } from "../AuthContext";
 
-const LowPartExpenses = () => {
+interface LowPartExpensesProps{
+    categories: any
+    totalExpenses: number
+}
+const LowPartExpenses : React.FC<LowPartExpensesProps> = ({categories, totalExpenses}) => {
 
     const { currency } = useContext(CurrencyContext)
-
-    const { user, setUser } = useAuth()
 
     const progress = useSharedValue(0)
 
@@ -37,8 +39,8 @@ const LowPartExpenses = () => {
     */
     const categoriesDetails = useMemo(() => {
         let angleStart = 0
-        const categoriesDetails = user.categories.map((category: any, index: number) => {
-            const percentage = category.total / user.totalExpenses;
+        const categoriesDetails = categories.map((category: any, index: number) => {
+            const percentage = category.total / totalExpenses;
             let angle = angleStart
             const segment = { ...category, angle, percentage }
             angleStart = angleStart + percentage * 360;
@@ -46,7 +48,7 @@ const LowPartExpenses = () => {
         })
         return categoriesDetails
     },
-        [user.categories, user.totalExpenses]
+        [categories, totalExpenses]
     );
 
     const categoriesFlexGap = 20
@@ -97,7 +99,7 @@ const LowPartExpenses = () => {
                 showsVerticalScrollIndicator={false}
             >
                 <View className="flex-1" style={{ gap: categoriesFlexGap }}>
-                    {user.categories.map((category: any, index: number) => {
+                    {categories.map((category: any, index: number) => {
                         return (
                             <View className="" key={index} onLayout={(event) => onLayout(event, index)}>
                                 <View className="flex-row gap-2 items-center">

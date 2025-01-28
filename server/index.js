@@ -6,6 +6,9 @@ import expenseRouter from "./routes/expense.mjs"
 import budgetRouter from "./routes/budget.mjs"
 import categoryRouter from "./routes/category.mjs"
 import userRouter from "./routes/user.mjs"
+import communityRouter from "./routes/community.mjs"
+import communityCategoryRouter from "./routes/communityCategory.mjs"
+import communityExpenseRouter from "./routes/communityExpense.mjs"
 import cookieParser from "cookie-parser";
 import session from "express-session";
 import passport from "passport";
@@ -34,7 +37,10 @@ app.use(passport.initialize())
 app.use(passport.session())
 
 // routes
-app.use(signUpRouter, loginRouter, expenseRouter, budgetRouter, categoryRouter, userRouter)
+app.use(
+  signUpRouter, loginRouter, expenseRouter, budgetRouter, categoryRouter, userRouter, communityRouter,
+  communityCategoryRouter, communityExpenseRouter
+)
 
 // Set port
 

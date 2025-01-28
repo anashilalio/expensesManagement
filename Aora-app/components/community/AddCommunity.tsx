@@ -7,32 +7,41 @@ import {
   View,
   Platform,
   Switch,
-  ScrollView, 
+  ScrollView,
 } from 'react-native';
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 import RNPickerSelect from 'react-native-picker-select';
 import { useAuth } from '../AuthContext';
-import { BudgetType } from '@/types/types';
+import { BudgetType, CommnunityType } from '@/types/types';
+import { formatISO } from 'date-fns';
+import { addExpenseToDB } from '@/api/expense';
+import { addCommunityToDB } from '@/api/community';
 
 type AddCommunityProps = {
   onBack: () => void;
 };
 
 const AddCommunity: React.FC<AddCommunityProps> = ({ onBack }) => {
-      const { user, setUser } = useAuth()
-    
-  const [communityName, setCommunityName] = useState('');
-  const [description, setDescription] = useState('');
+
+  const { user, setUser } = useAuth()
+
+  const [community, setCommunity] = useState<CommnunityType>({
+    name: '',
+    description: '',
+    members: []
+  });
+
   const [isPrivate, setIsPrivate] = useState(false);
-const [categories, setCategories] = useState<any>([
+  const [categories, setCategories] = useState<any>([
     { label: '', value: '' }
   ]);
-const [budget, setBudget] = useState<BudgetType>({
+  const [budget, setBudget] = useState<BudgetType>({
     category: '',
     maxAmount: 0,
     currentAmount: 0,
     date: ''
   })
+
   useEffect(() => {
     const categoriesLabelValue = user.categories.map((category: any) => ({
       label: category.name,
@@ -40,10 +49,43 @@ const [budget, setBudget] = useState<BudgetType>({
     }))
     setCategories(categoriesLabelValue)
   }, [user.categories])
-  const handleCreateCommunity = () => {
-    
-    console.log('Creating community:', { communityName, description, isPrivate });
-  };
+
+  const checkIfCommunityExit = () => {
+
+    if (!user.communities)
+      return true
+
+    let isDefined = user.communities.find((userCommunity: any) => userCommunity.name === community.name)
+    if (isDefined)
+      return false
+
+    return true
+  }
+
+  const addCommunity = async () => {
+
+    if (!checkIfCommunityExit())
+      return
+
+    setCommunity({
+      ...community,
+      members: []
+    })
+
+    const newCommunity = await addCommunityToDB(community)
+    console.log(newCommunity);
+
+    if (newCommunity) {
+
+      const userCommunities = [...user.communities, newCommunity];
+
+      setUser({
+        ...user,
+        communities: userCommunities
+      })
+
+    }
+  }
 
   return (
     <SafeAreaProvider>
@@ -79,8 +121,8 @@ const [budget, setBudget] = useState<BudgetType>({
                 className="mb-4 h-12 border border-gray-300 rounded-lg px-3 text-gray-800"
                 placeholder="Awesome Community"
                 placeholderTextColor="#999"
-                value={communityName}
-                onChangeText={setCommunityName}
+                value={community.name}
+                onChangeText={(input) => setCommunity({ ...community, name: input })}
               />
 
               <Text className="text-base text-gray-700 mb-1">Description</Text>
@@ -88,8 +130,8 @@ const [budget, setBudget] = useState<BudgetType>({
                 className="mb-4 h-20 border border-gray-300 rounded-lg px-3 text-gray-800"
                 placeholder="What's your community about?"
                 placeholderTextColor="#999"
-                value={description}
-                onChangeText={setDescription}
+                value={community.description}
+                onChangeText={(input) => setCommunity({ ...community, description: input })}
                 multiline
               />
 
@@ -106,27 +148,27 @@ const [budget, setBudget] = useState<BudgetType>({
                 />
               </View> */}
               <View>
-                <TextInput 
-                placeholder='Budget'
-                keyboardType="numeric"
+                <TextInput
+                  placeholder='Budget'
+                  keyboardType="numeric"
 
                 />
               </View>
-                <View>
+              <View>
                 <RNPickerSelect
-onValueChange={(input) => setBudget({ ...budget, category: input })}
-items={categories}
-placeholder={{
-  label: 'Select a Category',
-  value: null,
-  color: '#9CA3AF',
-}}
+                  onValueChange={(input) => setBudget({ ...budget, category: input })}
+                  items={categories}
+                  placeholder={{
+                    label: 'Select a Category',
+                    value: null,
+                    color: '#9CA3AF',
+                  }}
                 />
-                </View>
+              </View>
             </View>
 
             <TouchableOpacity
-              onPress={handleCreateCommunity}
+              onPress={() => addCommunity()}
               className="bg-violet rounded-lg py-4 mt-2"
             >
               <Text className="text-center text-white font-semibold text-base">

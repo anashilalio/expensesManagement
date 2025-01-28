@@ -24,12 +24,12 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     })
     const [loading, setLoading] = useState(true)
 
-    const attachTotalExpenses = (data: any) => {
-        const totalExpenses = data.expenses.reduce((sum: number, expense: any) => sum + expense.amount, 0);
-        data.totalExpenses = totalExpenses
+    const attachTotalPersonalExpenses = (data: any) => {
+        const totalPersonalExpenses = data.expenses.reduce((sum: number, expense: any) => sum + expense.amount, 0);
+        data.totalPersonalExpenses = totalPersonalExpenses
     }
 
-    const attachCategoriesTotal = (data: any) => {
+    const attachPersonalCategoriesTotal = (data: any) => {
         let categoriesTotal = data.expenses.reduce((arr: any, expense: any) => {
             if(!arr[expense.category])
                 arr[expense.category] = 0
@@ -46,20 +46,52 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
     }
 
+    const attachCommunitiesTotalExpenses = (data: any) => {
+
+        data.communities.forEach((community: any) => {
+
+            const communityExpenses = data.communitiesExpenses.filter((expense: any) => expense.communityCode === community.code);
+        
+            const totalExpense = communityExpenses.reduce((sum: number, expense: any) => sum + expense.amount, 0);
+        
+            community.total = totalExpense;
+        });
+    }
+
+    const attachCommunitiesCategoriesTotal = (data: any) => {
+
+        data.communitiesCategories.forEach((category: any) => {
+
+            const categoryExpenses = data.communitiesExpenses.filter((expense: any) => 
+                expense.communityCode === category.communityCode && expense.category === category.name
+            );
+        
+            const totalExpense = categoryExpenses.reduce((sum:number, expense:any) => sum + expense.amount, 0);
+        
+            category.total = totalExpense;
+        });
+        
+    }
+
     const loadUserData = async () => {
         try {
             const response = await axios.get(baseUrl + "api/user/getData")
             let { data } = response
 
-            attachTotalExpenses(data)
+            attachTotalPersonalExpenses(data)
 
-            attachCategoriesTotal(data)
+            attachPersonalCategoriesTotal(data)
 
+            attachCommunitiesTotalExpenses(data)
+
+            attachCommunitiesCategoriesTotal(data)
+            
             const sortedExpenses = data.expenses.sort((a:any, b:any) => new Date(b.date) - new Date(a.date));
             
             data.expenses = sortedExpenses
             
             setUser(data)
+            console.log(data);
             
             await AsyncStorage.setItem('@user', JSON.stringify(data))
         } catch (error) {
