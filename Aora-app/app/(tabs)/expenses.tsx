@@ -1,10 +1,11 @@
-import { ScrollView, Text, View } from 'react-native'
+import { ScrollView, Text, TouchableOpacity, View } from 'react-native'
 import React, { useMemo, useState } from 'react'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import Icons from 'react-native-vector-icons/Ionicons';
 import { useAuth } from '@/components/AuthContext';
 import Expense from '@/components/Expense';
+import ExpenseDetails from '@/components/expenses/ExpenseDetails';
 
 
 
@@ -17,19 +18,33 @@ interface ExpenseType {
 const Expenses = () => {
 
   const { user } = useAuth()
+  const [selectedExpense, setSelectedExpense] = useState(null)
 
   const expensesList = useMemo(() => {
     return user.expenses.map((expense: any, index: number) => (
-      <Expense
+      <TouchableOpacity
         key={index}
-        description={expense.description}
-        category={expense.category}
-        amount={expense.amount}
-        date={expense.date}
-      />
-    ));
+        onPress={() => {
+          setSelectedExpense(expense)
+        }}
+      >
+        <Expense
+          description={expense.description}
+          category={expense.category}
+          amount={expense.amount}
+          date={expense.date}
+        />
+      </TouchableOpacity>
+    ))
   }, [user.expenses])
-
+  if (selectedExpense) {
+    return (
+      <ExpenseDetails
+        expense={selectedExpense}
+        onBack={() => setSelectedExpense(null)}
+      />
+    )
+  }
   return (
     <SafeAreaView className='h-full w-full bg-white'>
       <ScrollView className='px-6'>

@@ -93,11 +93,11 @@ const Home = () => {
 
           <View>
             <TouchableOpacity
-              className="bg-red-400 py-2 px-4 rounded-3xl"
+              className="bg-violet py-2 px-4 rounded-3xl"
               activeOpacity={0.6}
               onPress={() => setIsPersonnalVisible(!isPersonnalVisible)}
             >
-              <Text>{isPersonnalVisible ? "go to Communities" : "go to Personnal"}</Text>
+              <Text className='text-center text-white'>{isPersonnalVisible ? "go to Communities" : "go to Personnal"}</Text>
             </TouchableOpacity>
           </View>
 
