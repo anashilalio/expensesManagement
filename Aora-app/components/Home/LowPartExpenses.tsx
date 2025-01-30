@@ -7,11 +7,11 @@ import { useSharedValue, withTiming } from "react-native-reanimated";
 import { formatAmount } from "../../utils/format"
 import { useAuth } from "../AuthContext";
 
-interface LowPartExpensesProps{
+interface LowPartExpensesProps {
     categories: any
     totalExpenses: number
 }
-const LowPartExpenses : React.FC<LowPartExpensesProps> = ({categories, totalExpenses}) => {
+const LowPartExpenses: React.FC<LowPartExpensesProps> = ({ categories, totalExpenses }) => {
 
     const { currency } = useContext(CurrencyContext)
 
@@ -61,7 +61,7 @@ const LowPartExpenses : React.FC<LowPartExpensesProps> = ({categories, totalExpe
             setViewHeights((prevHeights) => {
                 const newHeights = [...prevHeights];
                 newHeights[index] = height;
-                return newHeights.slice(0, 4); 
+                return newHeights.slice(0, 4);
             });
         }
     };
@@ -73,28 +73,46 @@ const LowPartExpenses : React.FC<LowPartExpensesProps> = ({categories, totalExpe
 
             <Svg className="flex-1" width={width} height={height} viewBox={`0 0 ${width} ${height}`}>
                 {
-                    categoriesDetails.map((category: any, index: number) => {
-                        return (
-                            <PieChartSegment
-                                key={index}
-                                cx={cx}
-                                cy={cy}
-                                r={r}
-                                strokeWidth={strokeWidth}
-                                stroke={category.color}
-                                circumeference={circumeference}
-                                percentage={category.percentage}
-                                originX={cx}
-                                originY={cy}
-                                angle={category.angle}
-                                progress={progress}
-                            />
-                        );
-                    })}
+                    totalExpenses > 0
+                        ?
+                        categoriesDetails.map((category: any, index: number) => {
+                            return (
+                                <PieChartSegment
+                                    key={index}
+                                    cx={cx}
+                                    cy={cy}
+                                    r={r}
+                                    strokeWidth={strokeWidth}
+                                    stroke={category.color}
+                                    circumeference={circumeference}
+                                    percentage={category.percentage}
+                                    originX={cx}
+                                    originY={cy}
+                                    angle={category.angle}
+                                    progress={progress}
+                                />
+                            );
+                        })
+                        :
+                        <PieChartSegment
+                            key={0}
+                            cx={cx}
+                            cy={cy}
+                            r={r}
+                            strokeWidth={strokeWidth}
+                            stroke="#CCCCCC"
+                            circumeference={circumeference}
+                            percentage={1}
+                            originX={cx}
+                            originY={cy}
+                            angle={0}
+                            progress={progress}
+                        />
+                }
             </Svg>
 
             <ScrollView
-                style={{maxHeight}}
+                style={{ maxHeight }}
                 nestedScrollEnabled={true}
                 showsVerticalScrollIndicator={false}
             >

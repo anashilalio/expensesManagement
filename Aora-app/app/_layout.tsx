@@ -4,6 +4,7 @@ import React, { useEffect } from "react";
 import "../global.css";
 import { StatusBar } from "expo-status-bar";
 import { AuthProvider } from "@/components/AuthContext";
+import Toast from "react-native-toast-message";
 
 SplashScreen.preventAutoHideAsync();
 
@@ -27,15 +28,17 @@ export default function RootLayout() {
   }, [fontsLoaded, errorFontLoading])
 
   return (
-
-    <Stack>
-      <Stack.Screen name="index" options={{ headerShown: false }} />
-      <Stack.Screen name="(auth)" options={{ headerShown: false }} />
-      <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-      <StatusBar
-        backgroundColor='#FFFFFF'
-        style="dark"
-      />
-    </Stack>
+    <>
+      <Stack>
+        <Stack.Screen name="index" options={{ headerShown: false }} />
+        <Stack.Screen name="(auth)" options={{ headerShown: false }} />
+        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />*
+        <StatusBar
+          backgroundColor='#FFFFFF'
+          style="dark"
+        />
+      </Stack>
+      <Toast />
+    </>
   );
 }

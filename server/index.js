@@ -9,6 +9,7 @@ import userRouter from "./routes/user.mjs"
 import communityRouter from "./routes/community.mjs"
 import communityCategoryRouter from "./routes/communityCategory.mjs"
 import communityExpenseRouter from "./routes/communityExpense.mjs"
+import communityBudgetRouter from "./routes/communityBudget.mjs"
 import cookieParser from "cookie-parser";
 import session from "express-session";
 import passport from "passport";
@@ -39,7 +40,7 @@ app.use(passport.session())
 // routes
 app.use(
   signUpRouter, loginRouter, expenseRouter, budgetRouter, categoryRouter, userRouter, communityRouter,
-  communityCategoryRouter, communityExpenseRouter
+  communityCategoryRouter, communityExpenseRouter, communityBudgetRouter
 )
 
 // Set port

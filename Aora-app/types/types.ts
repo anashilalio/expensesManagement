@@ -4,6 +4,13 @@ export interface ExpenseType {
   amount: number
   date: string
 }
+
+export interface UpdateExpenseType {
+  id: string
+  description: string
+  amount: number
+}
+
 export interface CommunityExpenseType extends ExpenseType {
   communityCode: string;
 }
@@ -13,6 +20,9 @@ export interface BudgetType {
   maxAmount: number,
   currentAmount: number,
   date: string
+}
+export interface CommunityBudgetType extends BudgetType{
+  communityCode: string
 }
 
 export interface CommnunityType {

@@ -4,7 +4,7 @@ import Swiper from 'react-native-swiper';
 import Hand from '../assets/images/handGrabingCash.png'
 import Receipt from '../assets/images/receipt.png'
 import Plan from '../assets/images/plan.png'
-import { Link, router } from 'expo-router';
+import { router } from 'expo-router';
 import '../global.css';
 import { StatusBar } from 'expo-status-bar';
 import React from 'react';

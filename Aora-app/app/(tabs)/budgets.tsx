@@ -1,83 +1,67 @@
 import { Text, View, TouchableOpacity } from 'react-native';
-import React, { useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import CreateBudgetPage from '../../components/Budget/CreateBudgetPage';
 import ItemBudget from '../../components/Budget/itemBudget'
 import BudgetDetails from '@/components/Budget/BudgetDetails';
-type BudgetType = {
-  category: string;
-  spend: string;
-  max: string;
-};
+import { useAuth } from '@/components/AuthContext';
+
 const Budgets = () => {
   const [showCreateBudgetPage, setShowCreateBudgetPage] = useState(false);
-  const [currentMonthIndex, setCurrentMonthIndex] = useState(new Date().getMonth());
-  const [selectedBudget, setSelectedBudget] = useState<BudgetType | null>(null);
-  const months = [
-    'January', 'February', 'March', 'April', 'May', 'June', 'July',
-    'August', 'September', 'October', 'November', 'December',
-  ];
-  const Budgets = {
-    data : [
-      {
-        "category" : "shopping" , 
-        "spend" : "100" , 
-        "max" : "1200"
-      },
-      {
-        "category" : "shopping" , 
-        "spend" : "200" , 
-        "max" : "1200"
-      },
-    ]
-    
-  }
-  const handleNextMonth = () => {
-    setCurrentMonthIndex((prev) => (prev + 1) % 12);
-  };
+  const [selectedBudget, setSelectedBudget] = useState<any>(null);
 
-  const handlePreviousMonth = () => {
-    setCurrentMonthIndex((prev) => (prev - 1 + 12) % 12);
-  };
+  const { user } = useAuth()
+
+  const budgets = useMemo(() => {
+    return [...user.budgets, user.communitiesBudgets]
+  }, [user.budgets, user.communitiesBudgets])
+
+  useEffect(() => {
+    console.log(budgets);
+
+  }, budgets)
   if (showCreateBudgetPage) {
     return <CreateBudgetPage onBack={() => setShowCreateBudgetPage(false)} />;
   }
-  if(selectedBudget){
-    return <BudgetDetails budget={selectedBudget} onBack={()=>setSelectedBudget(null)}/>
+  if (selectedBudget) {
+    return <BudgetDetails budget={selectedBudget} onBack={() => setSelectedBudget(null)} />
   }
+
+  const budgetsList = useMemo(() => {
+    return budgets.length > 0 ?
+      budgets.map((budget: any, index: number) => {
+        return (
+          <TouchableOpacity key={index} onPress={() => setSelectedBudget(budget)}>
+            <ItemBudget category={budget.category} current={budget.currentAmount} max={budget.maxAmount} />
+          </TouchableOpacity>
+        );
+      })
+      :
+      <Text className='text-center font-plight text-text-gray'>
+        No budgets
+      </Text>
+  }, budgets)
 
   return (
     <View className="flex-1 bg-violet">
-      <View className="flex-row justify-between items-center pt-5 px-5 h-44">
-        <TouchableOpacity onPress={handlePreviousMonth}>
-          <Text className="text-white text-xl font-bold">&lt;</Text>
-        </TouchableOpacity>
-        <Text className=" mx-2 text-white text-xl font-bold" >{months[currentMonthIndex]}</Text>
-        <TouchableOpacity onPress={handleNextMonth}>
-          <Text className="text-white text-xl font-bold">&gt;</Text>
-        </TouchableOpacity>
-      </View>
-      <TouchableOpacity
-          className="bg-violet rounded-lg flex-row py-4 justify-center items-center"
-          onPress={() => setShowCreateBudgetPage(true)}
-        >
-          <Text className="text-white text-lg font-bold bg-violet">Create a Budget</Text>
-          <Text></Text>
-        </TouchableOpacity>
-      <View className="flex-1 bg-violet">
-        <View className="flex-1 bg-gray-100 rounded-t-3xl  items-center  px-8 mt-8">
-          {Budgets.data.map((bg , index)=>{
-              return  <TouchableOpacity key={index} onPress={()=>setSelectedBudget(bg)}>
-                  <ItemBudget category={bg.category} spend={bg.spend} max={bg.max} />
-                </TouchableOpacity> ;  
-          })}
-         
-            
 
+      <TouchableOpacity
+        className="bg-violet rounded-lg flex-row py-4 justify-center items-center"
+        onPress={() => setShowCreateBudgetPage(true)}
+      >
+        <Text className="text-white text-lg font-bold bg-violet">Create a Budget</Text>
+        <Text></Text>
+      </TouchableOpacity>
+
+      <View className="flex-1 bg-violet">
+
+        <View className="flex-1 bg-gray-100 rounded-t-3xl  items-center  px-8 mt-8">
+          {budgetsList}
         </View>
+
       </View>
 
       <View className="px-5 pb-5 bg-white">
-        
+
       </View>
     </View>
   );

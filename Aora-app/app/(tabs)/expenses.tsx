@@ -20,6 +20,13 @@ const Expenses = () => {
   const { user } = useAuth()
   const [selectedExpense, setSelectedExpense] = useState(null)
 
+  const categoriesColors = useMemo(() => {
+    return user.categories.reduce((arr: any, category: any) => {
+      arr[category.name] = category.color;
+      return arr;
+    }, {});
+  }, user.categories)
+
   const expensesList = useMemo(() => {
     return user.expenses.map((expense: any, index: number) => (
       <TouchableOpacity
@@ -33,10 +40,12 @@ const Expenses = () => {
           category={expense.category}
           amount={expense.amount}
           date={expense.date}
+          color={categoriesColors[expense.category]}
         />
       </TouchableOpacity>
     ))
   }, [user.expenses])
+
   if (selectedExpense) {
     return (
       <ExpenseDetails
@@ -48,7 +57,7 @@ const Expenses = () => {
   return (
     <SafeAreaView className='h-full w-full bg-white'>
       <ScrollView className='px-6'>
-        
+
         <View className='flex flex-row justify-between px-2 mt-4'>
           <Icon name="filter-list" size={24} color="#000" />
           <Icons name="calendar-clear-sharp" size={24} color="#000" />

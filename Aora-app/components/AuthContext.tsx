@@ -36,14 +36,15 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
             arr[expense.category] += expense.amount
             return arr
         }, {});
-
+        
         data.categories = data.categories.map((category: any) => {
             return {
                 ...category,
-                total: categoriesTotal[category.name]
+                total: categoriesTotal[category.name] | 0
             }
         })
-
+        
+        
     }
 
     const attachCommunitiesTotalExpenses = (data: any) => {
@@ -91,8 +92,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
             data.expenses = sortedExpenses
             
             setUser(data)
-            console.log(data);
-            
+
             await AsyncStorage.setItem('@user', JSON.stringify(data))
         } catch (error) {
             console.error('Error loading user data:', error);

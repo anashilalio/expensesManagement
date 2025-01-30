@@ -4,9 +4,9 @@ import React, { useState, useCallback, useEffect, useMemo } from 'react';
 import debounce from 'lodash.debounce';
 import { useAuth } from '../AuthContext';
 import RNPickerSelect from 'react-native-picker-select';
-import { BudgetType } from '@/types/types';
+import { BudgetType, CommunityBudgetType } from '@/types/types';
 import { formatISO } from 'date-fns';
-import { addBudgetToDB } from '@/api/budget';
+import { addCommunityBudgetToDB, addPersonalBudgetToDB } from '@/api/budget';
 
 type CreateBudgetPageProps = {
   onBack: () => void;
@@ -16,19 +16,78 @@ const CreateBudgetPage: React.FC<CreateBudgetPageProps> = ({ onBack }) => {
 
   const { user, setUser } = useAuth()
 
-  const [categories, setCategories] = useState<any>([
+  const [personalCategories, setPersonalCategories] = useState([
+    { label: '', value: '', parent: '' }
+  ])
+  const [communitiesCategories, setCommunitiesCategories] = useState([
     { label: '', value: '' }
-  ]);
+  ])
+  const [categories, setCategories] = useState<any>('')
 
   useEffect(() => {
-    const categoriesLabelValue = user.categories.map((category: any) => ({
+
+    const personalCategoriesLabelValue = user.categories.map((category: any) => ({
       label: category.name,
-      value: category.name
+      value: category.name,
+      parent: 'personal-categories'
     }))
-    setCategories(categoriesLabelValue)
+
+    setPersonalCategories([{
+      label: 'Personal',
+      value: 'personal',
+      key: 'personal-categories',
+      inputLabel: 'Personal',
+      color: 'gray'
+    },
+    ...personalCategoriesLabelValue])
   }, [user.categories])
 
-  const [budget, setBudget] = useState<BudgetType>({
+  useEffect(() => {
+
+    const tmp = user.communitiesCategories.reduce((acc: any, communityCateg: any) => {
+      if (!acc[communityCateg.communityCode]) {
+        acc[communityCateg.communityCode] = []
+      }
+      acc[communityCateg.communityCode].push(communityCateg.name)
+      return acc
+    }, {})
+
+    const array = Object.keys(tmp).map((key) => ({ communityCode: key, names: tmp[key] }))
+
+    const updatedArray = array.map(item => {
+      const communi = user.communities.find((c: any) => c.code === item.communityCode)
+      return {
+        ...item,
+        community: communi ? communi.name : item.communityCode,
+        code: item.communityCode
+      }
+    })
+
+    const communitiesCategoriesLabelValue = updatedArray.flatMap(({ community, code, names }) => [
+      {
+        label: community,
+        value: community,
+        key: `${community}-section`,
+        inputLabel: community,
+        color: 'gray',
+      },
+      ...names.map((name: string) => ({
+        label: name,
+        value: { item: name, parent: code },
+        parent: `${community}-section`
+      }))
+    ])
+
+    setCommunitiesCategories(communitiesCategoriesLabelValue)
+  }, [user.communitiesCategories])
+
+  useEffect(() => {
+    setCategories([...personalCategories, ...communitiesCategories])
+  }, [personalCategories, communitiesCategories])
+
+
+  const [budget, setBudget] = useState<CommunityBudgetType>({
+    communityCode: '',
     category: '',
     maxAmount: 0,
     currentAmount: 0,
@@ -45,21 +104,54 @@ const CreateBudgetPage: React.FC<CreateBudgetPageProps> = ({ onBack }) => {
     []
   );
 
+  const getTotalOfCategory = () => {
+    console.log(user.categories);
+    console.log(budget);
+    
+    if(budget.communityCode === ''){
+      return user.categories.find((category:any) => category.name === budget.category).total
+    }else{
+      return user.communitiesCategories.find((category:any) => 
+        category.name === budget.category && category.communityCode === budget.communityCode).total
+    }
+  }
+
   const addBudget = async () => {
 
     let date = formatISO(new Date())
-    setBudget({ ...budget, date: date, currentAmount: 0 })
-    const newBudget = await addBudgetToDB(budget)
+    const currentAmount = getTotalOfCategory()
+    setBudget({ ...budget, date: date, currentAmount: getTotalOfCategory()})
 
-    if (newBudget) {
+    if(budget.communityCode === ''){
 
-      const updatedBudgets = [newBudget, ...user.budgets];
+      const personalBudget : BudgetType = {
+        category: budget.category,
+        maxAmount: budget.maxAmount,
+        currentAmount: getTotalOfCategory(),
+        date: date
+      }
 
-      setUser({
-        ...user,
-        budgets: updatedBudgets,
-      })
+      const newBudget = await addPersonalBudgetToDB(personalBudget)
+      
+      if(newBudget){
 
+        const updatedBudgets = [newBudget, ...user.budgets];
+        setUser({
+          ...user,
+          budgets: updatedBudgets,
+        })
+      }
+
+    }else{
+
+      const newBudget = await addCommunityBudgetToDB(budget)
+      if(newBudget){
+        const updatedBudgets = [newBudget, ...user.communitiesBudgets];
+        setUser({
+          ...user,
+          communitiesBudgets: updatedBudgets,
+        })
+      }
     }
   }
 
@@ -105,7 +197,14 @@ const CreateBudgetPage: React.FC<CreateBudgetPageProps> = ({ onBack }) => {
         {/*<View className="border-b border-gray-300 pb-4">*/}
         <View className="mb-4">
           <RNPickerSelect
-            onValueChange={(input) => setBudget({ ...budget, category: input })}
+            onValueChange={(input) => {
+              if (input) {
+                if (typeof input === "object")
+                  setBudget({ ...budget, category: input.item, communityCode: input.parent })
+                else
+                  setBudget({ ...budget, category: input, communityCode: '' })
+              }
+            }}
             items={categories}
             placeholder={{
               label: 'Select a Category',

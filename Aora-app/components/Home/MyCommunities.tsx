@@ -61,8 +61,6 @@ const MyCommunities = () => {
     useEffect(() => {
         if (user.communities.length === 0)
             return
-        console.log("user ")
-        console.log(user.communities);
 
         const communitiesLabelValue = user.communities.map((community: any) => ({
             label: community.name,
@@ -80,9 +78,6 @@ const MyCommunities = () => {
     useEffect(() => {
         if (!currentCommunity?.code || user.communitiesCategories.length === 0)
             return;
-
-        console.log("current com");
-        console.log(currentCommunity);
 
         const communityCategories = user.communitiesCategories.filter((category: any) =>
             category.communityCode === currentCommunity.code)

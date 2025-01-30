@@ -54,7 +54,11 @@ const RecentExpenses: React.FC<{ expenses: any, categories: any }> = ({ expenses
       </View>
 
       <View className='flex-col gap-4 mt-4'>
-        {expensesList}
+        {
+          expensesList.length > 0 
+          ? expensesList
+          : <Text className='font-plight text-lg text-gray-400 text-center mt-8'>No expenses</Text>
+        }
       </View>
     </View>
   );
