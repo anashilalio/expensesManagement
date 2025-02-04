@@ -7,7 +7,8 @@ import {
 } from 'react-native';
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 import AddCommunity from './AddCommunity';
-
+import Icon from 'react-native-vector-icons/MaterialIcons'
+import Icons from 'react-native-vector-icons/MaterialCommunityIcons'
 interface CommunityProps {
   onBack: () => void;
 }
@@ -21,13 +22,10 @@ const Community: React.FC<CommunityProps> = ({ onBack }) => {
   return (
     <SafeAreaProvider>
       <SafeAreaView className="flex-1 bg-gray-50 px-4 py-4">
-        <View className="flex-row items-center mb-4">
-          <TouchableOpacity
-            onPress={onBack}
-            className="p-2 mr-3 rounded-full bg-gray-200"
-          >
-            <Text className="text-gray-600">&larr;</Text>
-          </TouchableOpacity>
+        <View className="w-full flex-row justify-between items-center mb-5">
+                <TouchableOpacity onPress={onBack} className="p-3 bg-white rounded-full shadow-md">
+                  <Icon name="arrow-back" size={24} color="#4b5563" />
+                </TouchableOpacity>
           <Text className="flex-1 text-center text-xl font-semibold text-gray-900">
             Community
           </Text>

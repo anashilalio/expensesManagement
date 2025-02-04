@@ -7,7 +7,7 @@ import Community from '@/components/community/Community'
 import MyPersonnal from '@/components/Home/MyPersonnal'
 import MyCommunities from '@/components/Home/MyCommunities'
 import Notification from '@/components/Notification';
-
+import Profile from '../../components/Profile/Profile'
 interface CurrencyContextType {
   currency: string
 }
@@ -31,13 +31,16 @@ const Home = () => {
   const handleNextMonth = () => {
     setCurrentMonthIndex((prev) => (prev + 1) % 12);
   };
-
+  const [showProfile , setShowProfile ] = useState(false) ; 
   const handlePreviousMonth = () => {
     setCurrentMonthIndex((prev) => (prev - 1 + 12) % 12);
   };
 
   if (showCommunity) {
     return <Community onBack={() => setShowCommunity(false)} />
+  }
+  if (showProfile) {
+    return <Profile onBack={() => setShowProfile(false)} />
   }
 if(showNotification){
   return <Notification onBack={()=>setShowNotification(false)}/>
@@ -53,7 +56,7 @@ if(showNotification){
             </TouchableOpacity>
             <View className='flex flex-col  h-full'>
               <View className='flex flex-col  h-2/4 justify-center'>
-                <TouchableOpacity className="p-4  border-black">
+                <TouchableOpacity className="p-4  border-black" onPress={() => setShowProfile(true)}>
                   <Text className="text-black text-xl">Profile</Text>
                 </TouchableOpacity>
                 <TouchableOpacity className="p-4  border-black" onPress={() => setShowCommunity(true)}>
