@@ -6,6 +6,7 @@ import FontAwesome6 from '@expo/vector-icons/FontAwesome6';
 import Community from '@/components/community/Community'
 import MyPersonnal from '@/components/Home/MyPersonnal'
 import MyCommunities from '@/components/Home/MyCommunities'
+import Notification from '@/components/Notification';
 
 interface CurrencyContextType {
   currency: string
@@ -19,7 +20,7 @@ const Home = () => {
   const [showCommunity, setShowCommunity] = useState(false);
   const [showMenu, setShowMenu] = useState(false);
   const [currentMonthIndex, setCurrentMonthIndex] = useState(new Date().getMonth());
-
+  const [showNotification , setShowNotification ] = useState(false);
   const [isPersonnalVisible, setIsPersonnalVisible] = useState(true)
 
   const months = [
@@ -38,7 +39,9 @@ const Home = () => {
   if (showCommunity) {
     return <Community onBack={() => setShowCommunity(false)} />
   }
-
+if(showNotification){
+  return <Notification onBack={()=>setShowNotification(false)}/>
+}
   return (
     <SafeAreaView className='h-full w-full bg-white '>
       <ScrollView>
@@ -85,7 +88,7 @@ const Home = () => {
                 </TouchableOpacity>
               </View>
 
-              <TouchableOpacity>
+              <TouchableOpacity onPress={()=>setShowNotification(true)}>
                 <Ionicons name="notifications" size={24} color="black" />
               </TouchableOpacity>
             </View>
