@@ -38,6 +38,10 @@ const LowPartExpenses: React.FC<LowPartExpensesProps> = ({ categories, totalExpe
         angle and percentage are used to draw pieChart
     */
     const categoriesDetails = useMemo(() => {
+        console.log("lowerpart");
+        
+        console.log(categories);
+        
         let angleStart = 0
         const categoriesDetails = categories.map((category: any, index: number) => {
             const percentage = category.total / totalExpenses;

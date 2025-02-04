@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react'
+import React, { useEffect, useMemo } from 'react'
 import { Text, View } from "react-native"
 import Financials from "./Financials"
 import LowPartExpenses from "./LowPartExpenses"
@@ -12,7 +12,8 @@ interface MyPersonnalProps {
 }
 
 const MyPersonnal: React.FC<MyPersonnalProps> = ({ currentMonthIndex }) => {
-  const { user } = useAuth()
+
+  const { user, setUser } = useAuth()
 
   const filteredExpenses = useMemo(() => {
     return user.expenses.filter((expense: any) => {
@@ -21,21 +22,47 @@ const MyPersonnal: React.FC<MyPersonnalProps> = ({ currentMonthIndex }) => {
     })
   }, [user.expenses, currentMonthIndex])
 
-  const totalPersonalExpensesForMonth = useMemo(() => {
+  const totalExpensesForMonth = useMemo(() => {
     return filteredExpenses.reduce((sum: number, expense: any) => sum + expense.amount, 0)
   }, [filteredExpenses])
 
-  const userRecentExpenses = useMemo(() => {
+  const monthRecentExpenses = useMemo(() => {
     return filteredExpenses.slice(0, numberOfRecentExpenses)
+  }, [filteredExpenses])
+
+  useEffect(() => {
+
+    let categoriesTotal = filteredExpenses.reduce((arr: any, expense: any) => {
+      if (!arr[expense.category])
+        arr[expense.category] = 0
+      arr[expense.category] += expense.amount
+      return arr
+    }, {});
+
+
+    const updatedCategories = user.categories.map((category: any) => {
+      return {
+        ...category,
+        total: categoriesTotal[category.name] || 0
+      }
+    })
+
+    setUser({
+      ...user,
+      categories: updatedCategories
+    })
+    console.log("effect :");
+    console.log(user.categories);
+    
   }, [filteredExpenses])
 
   return (
     <View className='flex-1 gap-6'>
       <View className='w-full border-4 border-gray-50 rounded-3xl flex-col mt-6 p-6 gap-6'>
-        <TopPartExpenses totalExpenses={totalPersonalExpensesForMonth} />
-        <LowPartExpenses totalExpenses={totalPersonalExpensesForMonth} categories={user.categories} />
+        <TopPartExpenses totalExpenses={totalExpensesForMonth} />
+        <LowPartExpenses totalExpenses={totalExpensesForMonth} categories={user.categories} />
       </View>
-      <RecentExpenses expenses={userRecentExpenses} categories={user.categories} />
+      <RecentExpenses expenses={monthRecentExpenses} categories={user.categories} />
     </View>
   )
 }

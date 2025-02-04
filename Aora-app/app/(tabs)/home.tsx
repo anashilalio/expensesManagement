@@ -98,15 +98,32 @@ const Home = () => {
             </View>
           </View>
 
-          <View>
+          <View className='mt-8 mb-2 flex items-center'>
             <TouchableOpacity
-              className="bg-violet py-2 px-4 rounded-3xl"
+              className='border-4 border-gray-50 rounded-3xl flex-row'
               activeOpacity={0.6}
               onPress={() => setIsPersonnalVisible(!isPersonnalVisible)}
             >
-              <Text className='text-center text-white'>
-                {isPersonnalVisible ? "go to Communities" : "go to Personnal"}
-              </Text>
+              <View className='flex-1'>
+                <Text
+                  className={`
+                    ${isPersonnalVisible ? "bg-violet text-white" : "bg-white text-black"}
+                    py-2 px-4 rounded-3xl text-center font-pmedium
+                  `}
+                >
+                  Personal
+                </Text>
+              </View>
+              <View className='flex-1'>
+                <Text
+                  className={`
+                    ${isPersonnalVisible ? "bg-white text-black" : "bg-violet text-white"}
+                    py-2 px-4 rounded-3xl text-center font-pmedium
+                  `}
+                >
+                  Community
+                </Text>
+              </View>
             </TouchableOpacity>
           </View>
 

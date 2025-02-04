@@ -187,14 +187,18 @@ const CreateBudgetPage: React.FC<CreateBudgetPageProps> = ({ onBack }) => {
 
   return (
     <View className="flex-1 bg-violet">
-      <View className="flex-row items-center pt-10 px-5 h-24 w-full">
+
+      <View className="flex-row items-center justify-between pt-10 px-5 h-24 w-full">
         <TouchableOpacity onPress={onBack}>
           <Text className="text-white text-3xl font-bold ">&lt;</Text>
         </TouchableOpacity>
         <Text className="text-white text-xl font-bold text-center">Create Budget</Text>
+        <View>
+          <Text style={{display: "none"}}>&lt;</Text>
+        </View>
       </View>
 
-      <View className="flex-1 justify-center items-center">
+      <View className="flex-1 justify-center items-center mt-12 mb-8">
         <Text className="text-white text-base">How much do you want to spend?</Text>
         <View className="flex  flex-row items-center justify-center">
           <Text style={{
@@ -224,7 +228,6 @@ const CreateBudgetPage: React.FC<CreateBudgetPageProps> = ({ onBack }) => {
       </View>
 
       <View className="bg-white rounded-t-3xl p-5">
-        {/*<View className="border-b border-gray-300 pb-4">*/}
         <View className="mb-4">
           <RNPickerSelect
             onValueChange={(input) => {

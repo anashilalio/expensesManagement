@@ -1,9 +1,10 @@
-import { Text, View, TouchableOpacity } from 'react-native';
+import { Text, View, TouchableOpacity, ScrollView } from 'react-native';
 import React, { useEffect, useMemo, useState } from 'react';
 import CreateBudgetPage from '../../components/Budget/CreateBudgetPage';
 import ItemBudget from '../../components/Budget/itemBudget';
 import BudgetDetails from '@/components/Budget/BudgetDetails';
 import { useAuth } from '@/components/AuthContext';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 const Budgets = () => {
   const [showCreateBudgetPage, setShowCreateBudgetPage] = useState(false);
@@ -41,28 +42,30 @@ const Budgets = () => {
     content = <BudgetDetails budget={selectedBudget} onBack={() => setSelectedBudget(null)} />;
   } else {
     content = (
-      <>
-        <TouchableOpacity
-          className="bg-violet rounded-lg flex-row py-4 justify-center items-center"
-          onPress={() => setShowCreateBudgetPage(true)}
-        >
-          <Text className="text-white text-lg font-bold bg-violet">
-            Create a Budget
-          </Text>
-        </TouchableOpacity>
-
-        <View className="flex-1 bg-violet">
-          <View className="flex-1 bg-gray-100 rounded-t-3xl items-center px-8 mt-8">
-            {budgetsList}
-          </View>
+      <View className='px-6 py-4 flex-1'>
+        <View className="mb-6 flex-row justify-end">
+          <TouchableOpacity
+            onPress={() => setShowCreateBudgetPage(true)}
+          >
+            <Text className="text-violet font-semibold">
+              + Add New Budget
+            </Text>
+          </TouchableOpacity>
         </View>
-
-        <View className="px-5 pb-5 bg-white" />
-      </>
+        <View className='flex-col gap-6'>
+          {budgetsList}
+        </View>
+      </View>
     );
   }
 
-  return <View className="flex-1 bg-violet pt-12">{content}</View>;
+  return (
+    <SafeAreaView className='h-full w-full bg-white'>
+      <ScrollView className='flex-1'>
+        {content}
+      </ScrollView>
+    </SafeAreaView>
+  )
 };
 
 export default Budgets;

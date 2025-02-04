@@ -31,6 +31,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
     const attachPersonalCategoriesTotal = (data: any) => {
         let categoriesTotal = data.expenses.reduce((arr: any, expense: any) => {
+            
             if(!arr[expense.category])
                 arr[expense.category] = 0
             arr[expense.category] += expense.amount
@@ -40,10 +41,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         data.categories = data.categories.map((category: any) => {
             return {
                 ...category,
-                total: categoriesTotal[category.name] | 0
+                currentMonthtotal: categoriesTotal[category.name] | 0
             }
         })
-        
         
     }
 
@@ -69,7 +69,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         
             const totalExpense = categoryExpenses.reduce((sum:number, expense:any) => sum + expense.amount, 0);
         
-            category.total = totalExpense;
+            category.currentMonthtotal = totalExpense;
         });
         
     }
