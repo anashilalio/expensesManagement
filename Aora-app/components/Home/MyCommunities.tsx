@@ -45,7 +45,7 @@ const MyCommunities = () => {
             setCurrentCommunityExpensesList(list)
         }
 
-    }, [currentCommunity])
+    }, [currentCommunity, user.communitiesExpenses])
 
     // Dropdown labels
     const [communities, setCommunities] = useState<any>([
@@ -55,6 +55,8 @@ const MyCommunities = () => {
     // set selected community info
     const updateCurrentCommunity = (name: string) => {
         const selectedCommunity = user.communities.find((community: any) => community.name === name);
+        console.log(selectedCommunity);
+        
         setCurrentCommunity(selectedCommunity);
     }
 
@@ -69,7 +71,8 @@ const MyCommunities = () => {
         setCommunities(communitiesLabelValue)
 
         const firstCommunityName = communitiesLabelValue[0]['label']
-
+        console.log(firstCommunityName);
+        
         if (firstCommunityName) {
             updateCurrentCommunity(firstCommunityName);
         }
@@ -85,13 +88,22 @@ const MyCommunities = () => {
         setCurrentCommunityCategories(communityCategories)
     }, [currentCommunity, user.communitiesCategories])
 
-    if (user.communities.length === 0)
+    if (user.communities.length === 0){
         return (
             <View>
                 <Text>Join a Community</Text>
             </View>
         )
+    }
 
+    if(currentCommunity.name.length === 0){
+        return (
+            <View>
+                <Text>Loading...</Text>
+            </View>
+        );
+    }
+    
     return (
         <View className='flex-1 gap-6'>
 
@@ -99,6 +111,7 @@ const MyCommunities = () => {
                 <RNPickerSelect
                     onValueChange={(name) => updateCurrentCommunity(name)}
                     items={communities}
+                    value={currentCommunity.name}
                     placeholder={{
                         label: 'Select a Category',
                         value: null,

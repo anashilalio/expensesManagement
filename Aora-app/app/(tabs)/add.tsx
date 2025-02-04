@@ -19,6 +19,8 @@ import { SafeAreaView } from 'react-native-safe-area-context'
 import { defaultCategoriesNum } from '@/utils/constants'
 import { customCategoriesColor } from '@/utils/categoriesColors'
 import { addCommunityExpenseToDB, addPersonalExpenseToDB } from '@/api/expense'
+import Toast from 'react-native-toast-message'
+import { updateAmountPersonalBudgetInDB } from '@/api/budget'
 
 const Add = () => {
 
@@ -26,7 +28,6 @@ const Add = () => {
 
   const [repeatTransaction, setRepeatTransaction] = useState(false)
   const [selectedWallet, setSelectedWallet] = useState<string | undefined>(undefined)
-  const [showSuccess, setShowSucess] = useState(false)
   const [attachments, setAttachments] = useState<string[]>([])
 
   const [personalCategories, setPersonalCategories] = useState([
@@ -130,13 +131,6 @@ const Add = () => {
     { label: 'BqChaabi', value: 'BqChaabi' },
   ]
 
-  const expenseAddedNotif = () => {
-    setShowSucess(true)
-    setTimeout(() => {
-      setShowSucess(false)
-    }, 3000)
-  }
-
   const handleDeleteImage = (index: number) => {
     setAttachments((prevAttachments) =>
       prevAttachments.filter((_, i) => i !== index)
@@ -212,8 +206,6 @@ const Add = () => {
 
       if (newExpense) {
 
-        expenseAddedNotif()
-
         const updatedExpenses = [newExpense, ...user.expenses]
 
         const updatedTotalPersonalExpenses = user.totalPersonalExpenses + newExpense.amount
@@ -225,51 +217,99 @@ const Add = () => {
           return category
         })
 
+        const updatedBudgets = user.budgets.map((budget: any) => {
+          if (budget.category === newExpense.category) {
+            budget.currentAmount += newExpense.amount            
+            updateAmountPersonalBudgetInDB(newExpense.category, budget.currentAmount)
+          }
+          return budget
+        })
+
         setUser({
           ...user,
           expenses: updatedExpenses,
           totalPersonalExpenses: updatedTotalPersonalExpenses,
-          categories: updatedCategories
+          categories: updatedCategories,
+          budgets: updatedBudgets
         })
 
+        Toast.show({
+          type: "success",
+          text1: "Expense added",
+          text2: "Expense of " + expense.category + " was created successfully!",
+          position: "top",
+        });
+      }else{
+        Toast.show({
+          type: "error",
+          text1: "Error adding expense",
+          text2: "Error adding expense for " + expense.category,
+          position: "top",
+        });
       }
 
     } else {
 
       const newExpense = await addCommunityExpenseToDB(expense)
-      console.log(newExpense);
-      
-      if (newExpense) {
 
-        expenseAddedNotif()
+      if (newExpense) {
 
         const updatedCommunitiesExpenses = [newExpense, ...user.communitiesExpenses]
 
         const updatedCommunitiesCategories = user.communitiesCategories.map((category: any) => {
-          if (category.name === newExpense.category && category.communityCode === newExpense.communityCode) {
+          if (category.communityCode === newExpense.communityCode && category.name === newExpense.category) {
             category.total += newExpense.amount
           }
           return category
         })
 
+        const updatedCommunities = user.communities.map((community: any) => {
+          if (community.code === newExpense.communityCode) {
+            community.total += newExpense.amount
+          }
+          return community
+        })
+
+        const updatedCommunitiesBudgets = user.communitiesBudgets.map((budget: any) => {
+          if (budget.communityCode === newExpense.communityCode &&  budget.category === newExpense.category) {
+            budget.currentAmount += newExpense.amount
+          }
+          return budget
+        })
+
         setUser({
           ...user,
+          communities: updatedCommunities,
           communitiesExpenses: updatedCommunitiesExpenses,
-          communitiesCategories: updatedCommunitiesCategories
+          communitiesCategories: updatedCommunitiesCategories,
+          communitiesBudgets: updatedCommunitiesBudgets
         })
-        console.log(user);
-        
+        Toast.show({
+          type: "success",
+          text1: "Expense added",
+          text2: "Expense of " + expense.category + " was created successfully!",
+          position: "top",
+        });
+      }else{
+        Toast.show({
+          type: "error",
+          text1: "Error adding expense",
+          text2: "Error adding expense for " + expense.category,
+          position: "top",
+        });
       }
     }
 
   }
 
   const addCategory = async () => {
-    const numberOfCategories = user.categories.reduce((sum: number, category: any) => ++sum, 0)
-    const index = numberOfCategories - defaultCategoriesNum
-    const color = customCategoriesColor[index]
 
     if (target === 'Personal') {
+
+      const numberOfCategories = user.categories.reduce((sum: number, category: any) => ++sum, 0)
+      const index = numberOfCategories - defaultCategoriesNum
+      const color = customCategoriesColor[index]
+
       const newCategory = await addPersonalCategoryToDB(newCategoryName, color)
 
       if (newCategory) {
@@ -279,23 +319,56 @@ const Add = () => {
           categories: [...user.categories, newCategory]
         })
         setShowNewCategoryModal(false)
+        Toast.show({
+          type: "success",
+          text1: "Category created",
+          text2: "Category " + newCategoryName + " was created successfully!",
+          position: "top",
+        });
+      }else{
+        Toast.show({
+          type: "error",
+          text1: "Error creating category",
+          text2: "Error creating category " + newCategoryName,
+          position: "top",
+        });
       }
     } else {
+
       const communityCode = user.communities.find((community: any) => community.name === target).code
-      console.log(communityCode)
+
+      const index = user.communitiesCategories.reduce((sum: number, category: any) => {
+        if(category.communityCode === communityCode)
+          return ++sum
+        return sum
+      }, 0)
+      
+      const color = customCategoriesColor[index]
 
       const newCategory = await addCommunityCategoryToDB(communityCode, newCategoryName, color)
-      console.log(newCategory)
 
       if (newCategory) {
         newCategory.total = 0
+        console.log("newcatadded");
+        
         setUser({
           ...user,
           communitiesCategories: [...user.communitiesCategories, newCategory]
         })
         setShowNewCategoryModal(false)
-        console.log(user)
-
+        Toast.show({
+          type: "success",
+          text1: "Category created",
+          text2: "Category " + newCategoryName + " was created successfully!",
+          position: "top",
+        });
+      }else{
+        Toast.show({
+          type: "error",
+          text1: "Error creating category",
+          text2: "Error creating category " + newCategoryName,
+          position: "top",
+        });
       }
     }
   }
@@ -451,22 +524,6 @@ const Add = () => {
           </TouchableOpacity>
         </View>
       </View>
-
-      <Modal
-        transparent
-        animationType="fade"
-        visible={showSuccess}
-        onRequestClose={() => setShowSucess(false)}
-      >
-        <View className="flex-1 justify-center items-center bg-black bg-opacity-50">
-          <View className="w-48 p-5 bg-white rounded-lg items-center">
-            <Text className="text-lg font-bold text-emerald-400 mb-2">Success!</Text>
-            <Text className="text-center text-gray-500">
-              Your transaction was added successfully.
-            </Text>
-          </View>
-        </View>
-      </Modal>
 
       <Modal
         transparent

@@ -87,10 +87,14 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
             attachCommunitiesCategoriesTotal(data)
             
-            const sortedExpenses = data.expenses.sort((a:any, b:any) => new Date(b.date) - new Date(a.date));
+            const sortedPersonalExpenses = data.expenses.sort((a:any, b:any) => new Date(b.date) - new Date(a.date));
             
-            data.expenses = sortedExpenses
-            
+            data.expenses = sortedPersonalExpenses
+
+            const sortedCommunitiesExpenses = data.communitiesExpenses.sort((a:any, b:any) => new Date(b.date) - new Date(a.date));
+
+            data.communitiesExpenses = sortedCommunitiesExpenses
+
             setUser(data)
 
             await AsyncStorage.setItem('@user', JSON.stringify(data))
