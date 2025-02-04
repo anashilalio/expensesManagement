@@ -1,11 +1,25 @@
 import { Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
-import React from 'react'
+import React ,{useState} from 'react'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import User from "../../assets/images/user.jpeg"
 import Setting from '@/components/Profile/Setting'
 import FontAwesome from '@expo/vector-icons/FontAwesome';
-
+import ProfileSetting from '../../components/Profile/Profile'
+import ExportData from '@/components/Profile/ExportData'
+import Currency from '@/components/Profile/Currency'
 const Profile = () => {
+  const [showProfile , setShowProfile] = useState(false);
+  const [showCurrency , setShowCurrency ] = useState(false);
+  const [showExportData , setShowExportData ] = useState(false);
+  if(showProfile){
+    return <ProfileSetting onBack={()=>setShowProfile(false)}/>
+  }
+  if(showCurrency){
+    return <Currency onBack={()=>setShowCurrency(false)}/>
+  }
+  if(showExportData){
+    return <ExportData onBack={()=>setShowExportData(false)}/>
+  }
   return (
     <SafeAreaView>
       <ScrollView>
@@ -18,27 +32,29 @@ const Profile = () => {
           </View>
 
           <View className='flex-col'>
-            
-            <Setting
+            <TouchableOpacity onPress={()=>setShowProfile(true)}>
+            <Setting 
               title='Edit profile'
               details='Change profile image, username, password'
               icon='Profile'
             />
+
+            </TouchableOpacity>
+            <TouchableOpacity onPress={()=>setShowCurrency(true)}>
             <Setting
               title='Currency'
               details='Change currency'
               icon='Currency'
             />
-            <Setting
-              title='Categories'
-              details='Manage categories'
-              icon='Category'
-            />
+            </TouchableOpacity>
+            <TouchableOpacity onPress={()=>setShowExportData(true)}>
             <Setting
               title='Export Data'
               details='Export your expenses information as csv'
               icon='Export'
             />
+            </TouchableOpacity>
+              
           </View>
 
           <TouchableOpacity className='bg-tomato-secondary p-4 rounded-full'>

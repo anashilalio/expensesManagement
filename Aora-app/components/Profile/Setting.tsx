@@ -13,13 +13,14 @@ const Setting: React.FC<SettingProps> = ({title, details, icon}) => {
     const Icon = profileSettingsIcons[icon] || null
 
     return(
-        <TouchableOpacity className="flex-row items-center gap-6 py-5 border-b-hairline border-gray-200">
+        
+        <View className="flex-row items-center gap-6 py-5 border-b-hairline border-gray-200">
             {Icon && <Icon size={28} color={text.title}/>}
             <View className="flex-col">
                 <Text className="text-base text-title font-psemibold">{title}</Text>
                 <Text className="text-sm text-subtitle font-plight">{details}</Text>
             </View>
-        </TouchableOpacity>
+        </View>
     )
 }
 export default Setting
