@@ -14,7 +14,6 @@ import RNPickerSelect from 'react-native-picker-select';
 import { useAuth } from '../AuthContext';
 import { BudgetType, CommnunityType } from '@/types/types';
 import { formatISO } from 'date-fns';
-import { addExpenseToDB } from '@/api/expense';
 import { addCommunityToDB } from '@/api/community';
 
 type AddCommunityProps = {
@@ -73,7 +72,6 @@ const AddCommunity: React.FC<AddCommunityProps> = ({ onBack }) => {
     })
 
     const newCommunity = await addCommunityToDB(community)
-    console.log(newCommunity);
 
     if (newCommunity) {
 

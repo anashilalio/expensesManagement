@@ -11,24 +11,8 @@ const Budgets = () => {
 
   const { user } = useAuth();
 
-  const budgets = useMemo(() => {
-    if (!user) return [];
-
-    const communityBudgetsArray = Array.isArray(user.communitiesBudgets)
-      ? user.communitiesBudgets
-      : user.communitiesBudgets
-      ? [user.communitiesBudgets]
-      : [];
-
-    return [...(user.budgets || []), ...communityBudgetsArray];
-  }, [user]);
-
-  useEffect(() => {
-    console.log('Budgets:', budgets);
-  }, [budgets]);
-
-  const budgetsList = useMemo(() => {
-    if (!budgets || budgets.length === 0) {
+  const budgetsList: React.JSX.Element[] | React.JSX.Element = useMemo(() => {
+    if (user.budgets.length === 0 && user.communitiesBudgets.length === 0) {
       return (
         <Text className="text-center font-plight text-text-gray">
           No budgets
@@ -36,7 +20,9 @@ const Budgets = () => {
       );
     }
 
-    return budgets.map((budget, index) => (
+    const budgets = [...user.budgets, ...user.communitiesBudgets]
+
+    return budgets.map((budget: any, index: number) => (
       <TouchableOpacity key={index} onPress={() => setSelectedBudget(budget)}>
         <ItemBudget
           category={budget.category}
@@ -45,7 +31,7 @@ const Budgets = () => {
         />
       </TouchableOpacity>
     ));
-  }, [budgets]);
+  }, [user.budgets, user.communitiesBudgets]);
 
   let content;
 

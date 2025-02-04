@@ -7,6 +7,7 @@ import RNPickerSelect from 'react-native-picker-select';
 import { BudgetType, CommunityBudgetType } from '@/types/types';
 import { formatISO } from 'date-fns';
 import { addCommunityBudgetToDB, addPersonalBudgetToDB } from '@/api/budget';
+import Toast from 'react-native-toast-message';
 
 type CreateBudgetPageProps = {
   onBack: () => void;
@@ -85,7 +86,6 @@ const CreateBudgetPage: React.FC<CreateBudgetPageProps> = ({ onBack }) => {
     setCategories([...personalCategories, ...communitiesCategories])
   }, [personalCategories, communitiesCategories])
 
-
   const [budget, setBudget] = useState<CommunityBudgetType>({
     communityCode: '',
     category: '',
@@ -107,11 +107,11 @@ const CreateBudgetPage: React.FC<CreateBudgetPageProps> = ({ onBack }) => {
   const getTotalOfCategory = () => {
     console.log(user.categories);
     console.log(budget);
-    
-    if(budget.communityCode === ''){
-      return user.categories.find((category:any) => category.name === budget.category).total
-    }else{
-      return user.communitiesCategories.find((category:any) => 
+
+    if (budget.communityCode === '') {
+      return user.categories.find((category: any) => category.name === budget.category).total
+    } else {
+      return user.communitiesCategories.find((category: any) =>
         category.name === budget.category && category.communityCode === budget.communityCode).total
     }
   }
@@ -120,11 +120,11 @@ const CreateBudgetPage: React.FC<CreateBudgetPageProps> = ({ onBack }) => {
 
     let date = formatISO(new Date())
     const currentAmount = getTotalOfCategory()
-    setBudget({ ...budget, date: date, currentAmount: getTotalOfCategory()})
+    setBudget({ ...budget, date: date, currentAmount: getTotalOfCategory() })
 
-    if(budget.communityCode === ''){
+    if (budget.communityCode === '') {
 
-      const personalBudget : BudgetType = {
+      const personalBudget: BudgetType = {
         category: budget.category,
         maxAmount: budget.maxAmount,
         currentAmount: getTotalOfCategory(),
@@ -132,26 +132,56 @@ const CreateBudgetPage: React.FC<CreateBudgetPageProps> = ({ onBack }) => {
       }
 
       const newBudget = await addPersonalBudgetToDB(personalBudget)
-      
-      if(newBudget){
+
+      if (newBudget) {
 
         const updatedBudgets = [newBudget, ...user.budgets];
         setUser({
           ...user,
           budgets: updatedBudgets,
         })
-      }
 
-    }else{
+        Toast.show({
+          type: "success",
+          text1: "Budget Created",
+          text2: "Budget for" + budget.category + " was created successfully!",
+          position: "top",
+        });
+      } else {
+        Toast.show({
+          type: "error",
+          text1: "Error creating budget",
+          text2: "Error creating budget for" + budget.category,
+          position: "top",
+        });
+      }
+      onBack()
+    } else {
 
       const newBudget = await addCommunityBudgetToDB(budget)
-      if(newBudget){
+      if (newBudget) {
         const updatedBudgets = [newBudget, ...user.communitiesBudgets];
         setUser({
           ...user,
           communitiesBudgets: updatedBudgets,
         })
+
+        Toast.show({
+          type: "success",
+          text1: "Budget Created",
+          text2: "Budget for" + budget.category + " was created successfully!",
+          position: "top",
+        });
+
+      } else {
+        Toast.show({
+          type: "error",
+          text1: "Error creating budget",
+          text2: "Error creating budget for" + budget.category,
+          position: "top",
+        });
       }
+      onBack()
     }
   }
 
