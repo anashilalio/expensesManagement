@@ -7,24 +7,37 @@ import RecentExpenses from './RecentExpenses'
 import { useAuth } from '../AuthContext'
 import { numberOfRecentExpenses } from '@/utils/constants'
 
-const MyPersonnal = () => {
+interface MyPersonnalProps {
+  currentMonthIndex: number
+}
 
-    const { user } = useAuth()
+const MyPersonnal: React.FC<MyPersonnalProps> = ({ currentMonthIndex }) => {
+  const { user } = useAuth()
 
-    const userExpensesList = useMemo(() => {
-        return user.expenses.filter((expense: any, index: number) => index < numberOfRecentExpenses)
-    }, [user.expenses])
+  const filteredExpenses = useMemo(() => {
+    return user.expenses.filter((expense: any) => {
+      const expenseMonth = new Date(expense.date).getMonth()
+      return expenseMonth === currentMonthIndex
+    })
+  }, [user.expenses, currentMonthIndex])
 
-    return (
-        <View className='flex-1 gap-6'>
-            <View className='w-full border-4 border-gray-50 rounded-3xl flex-col mt-6 p-6 gap-6'>
-                <TopPartExpenses totalExpenses={user.totalPersonalExpenses}/>
-                <LowPartExpenses totalExpenses={user.totalPersonalExpenses} categories={user.categories}/>
-            </View>
+  const totalPersonalExpensesForMonth = useMemo(() => {
+    return filteredExpenses.reduce((sum: number, expense: any) => sum + expense.amount, 0)
+  }, [filteredExpenses])
 
-            <RecentExpenses expenses={userExpensesList} categories={user.categories}/>
-        </View>
-    )
+  const userRecentExpenses = useMemo(() => {
+    return filteredExpenses.slice(0, numberOfRecentExpenses)
+  }, [filteredExpenses])
+
+  return (
+    <View className='flex-1 gap-6'>
+      <View className='w-full border-4 border-gray-50 rounded-3xl flex-col mt-6 p-6 gap-6'>
+        <TopPartExpenses totalExpenses={totalPersonalExpensesForMonth} />
+        <LowPartExpenses totalExpenses={totalPersonalExpensesForMonth} categories={user.categories} />
+      </View>
+      <RecentExpenses expenses={userRecentExpenses} categories={user.categories} />
+    </View>
+  )
 }
 
 export default MyPersonnal
