@@ -6,7 +6,7 @@ import { router } from 'expo-router';
 const RecentExpenses: React.FC<{ expenses: any, categories: any }> = ({ expenses, categories }) => {
 
   const expensesList = useMemo(() => {
-    if (expenses === null || expenses === undefined)
+    if (expenses === null || expenses === undefined || categories === undefined)
       return (
         <View className='flex-1 pt-12'>
           <Text className='text-center font-plight text-text-gray'>
@@ -19,8 +19,14 @@ const RecentExpenses: React.FC<{ expenses: any, categories: any }> = ({ expenses
 
       expenses.map((expense: any, index: number) => {
 
-        const color = categories.find((category: any) => category.name === expense.category).color;
-        console.log(color);
+        const category = categories.find((category: any) => category.name === expense.category)
+console.log("categor found");
+console.log(category);
+
+        if(category === undefined)
+          return
+        
+        const color = category.color
         
         return (
           <Expense
@@ -34,7 +40,7 @@ const RecentExpenses: React.FC<{ expenses: any, categories: any }> = ({ expenses
         );
       })
     )
-  }, [expenses])
+  }, [expenses, categories])
 
   const handleSeeMore = () => {
     router.push('/(tabs)/expenses')

@@ -107,7 +107,7 @@ const Home = () => {
               <View className='flex-1'>
                 <Text
                   className={`
-                    ${isPersonnalVisible ? "bg-violet text-white" : "bg-white text-black"}
+                    ${isPersonnalVisible ? "bg-violet text-white" : "bg-gray-50 text-violet"}
                     py-2 px-4 rounded-3xl text-center font-pmedium
                   `}
                 >
@@ -117,7 +117,7 @@ const Home = () => {
               <View className='flex-1'>
                 <Text
                   className={`
-                    ${isPersonnalVisible ? "bg-white text-black" : "bg-violet text-white"}
+                    ${isPersonnalVisible ? "bg-gray-50 text-violet" : "bg-violet text-white"}
                     py-2 px-4 rounded-3xl text-center font-pmedium
                   `}
                 >

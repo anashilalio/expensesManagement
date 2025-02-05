@@ -5,7 +5,6 @@ import TopPartExpenses from './TopPartExpenses';
 import LowPartExpenses from './LowPartExpenses';
 import { useAuth } from '../AuthContext';
 import RNPickerSelect from 'react-native-picker-select';
-import { CommnunityCategoryType } from '@/types/types';
 import { numberOfRecentExpenses } from '@/utils/constants';
 
 interface CurrentCommunityType {
@@ -56,21 +55,33 @@ const MyCommunities: React.FC<MyCommunitiesProps> = ({ currentMonthIndex }) => {
 
   const filteredCommunityExpenses = useMemo(() => {
     if (!currentCommunity?.code) return [];
-    return user.communitiesExpenses.filter((expense: any) =>
+    const arr = user.communitiesExpenses.filter((expense: any) =>
       expense.communityCode === currentCommunity.code &&
       new Date(expense.date).getMonth() === currentMonthIndex
     );
+    console.log("filteredCommunityExpenses");
+    console.log(arr);
+
+    return arr
   }, [user.communitiesExpenses, currentCommunity, currentMonthIndex]);
 
   const totalCommunityExpensesForMonth = useMemo(() => {
-    return filteredCommunityExpenses.reduce((sum: number, expense: any) => sum + expense.amount, 0);
+    const tot = filteredCommunityExpenses.reduce((sum: number, expense: any) => sum + expense.amount, 0);
+    console.log("totalCommunityExpensesForMonth");
+    console.log(tot);
+
+    return tot
   }, [filteredCommunityExpenses]);
 
   const monthRecentExpenses = useMemo(() => {
-    return filteredCommunityExpenses.slice(0, numberOfRecentExpenses)
+    const arr = filteredCommunityExpenses.slice(0, numberOfRecentExpenses)
+    console.log("monthRecentExpenses");
+    console.log(arr);
+
+    return arr
   }, [filteredCommunityExpenses])
 
-  const communityCategories =  useMemo(() => {
+  const communityCategories = useMemo(() => {
 
     if (!currentCommunityCategories)
       return []
@@ -83,16 +94,20 @@ const MyCommunities: React.FC<MyCommunitiesProps> = ({ currentMonthIndex }) => {
     }, {});
 
     console.log(categoriesTotal);
-    
-    return currentCommunityCategories.map((category: any) => {
+    console.log("communityCategories");
+
+    const arr = currentCommunityCategories.map((category: any) => {
       return {
         ...category,
-        currentMonthTotal: categoriesTotal[category.name] || 0
+        total: categoriesTotal[category.name] || 0
       }
     })
+    console.log(arr);
 
-  }, [filteredCommunityExpenses, currentCommunityCategories])
-  
+    return arr
+
+  }, [currentCommunityCategories, filteredCommunityExpenses])
+
   if (user.communities.length === 0) {
     return (
       <View>
@@ -101,17 +116,18 @@ const MyCommunities: React.FC<MyCommunitiesProps> = ({ currentMonthIndex }) => {
     );
   }
 
-  if(currentCommunity.name.length === 0){
-    return(
+  if (currentCommunity.name.length === 0) {
+    return (
       <Text>
         Loading...
       </Text>
     )
   }
 
+
   return (
     <View className="flex-1 gap-6">
-      <View>
+      <View className='flex-1 rounded-full mt-6 bg-gray-50'>
         <RNPickerSelect
           onValueChange={(name) => updateCurrentCommunity(name)}
           items={communities}
@@ -121,20 +137,10 @@ const MyCommunities: React.FC<MyCommunitiesProps> = ({ currentMonthIndex }) => {
             value: null,
             color: '#9CA3AF'
           }}
-          style={{
-            inputAndroid: {
-              backgroundColor: '#FFFFFF',
-              borderRadius: 8,
-              borderColor: '#E5E7EB',
-              borderWidth: 1,
-              padding: 12,
-              color: '#6B7280'
-            }
-          }}
         />
       </View>
-      <View className="w-full border-4 border-gray-50 rounded-3xl flex-col mt-6 p-6 gap-6">
-        <TopPartExpenses totalExpenses={totalCommunityExpensesForMonth} />
+      <View className="w-full border-4 border-gray-50 rounded-3xl flex-col p-6 gap-6">
+        <TopPartExpenses totalExpenses={totalCommunityExpensesForMonth} currentMonthIndex={currentMonthIndex} />
         <LowPartExpenses totalExpenses={totalCommunityExpensesForMonth} categories={communityCategories} />
       </View>
       <RecentExpenses expenses={monthRecentExpenses} categories={currentCommunityCategories} />

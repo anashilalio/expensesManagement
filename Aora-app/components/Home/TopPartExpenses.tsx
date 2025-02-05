@@ -1,17 +1,29 @@
-import React, { useContext } from "react"
+import React, { useContext, useEffect, useMemo } from "react"
 import { Text, View } from "react-native"
 import { CurrencyContext } from "@/app/(tabs)/home"
 import { formatAmount } from "../../utils/format"
 
-const TopPartExpenses : React.FC<{totalExpenses: number}> = ({totalExpenses}) => {
+const TopPartExpenses: React.FC<{ totalExpenses: number, currentMonthIndex: number }> = ({ totalExpenses, currentMonthIndex }) => {
 
     const { currency } = useContext(CurrencyContext)
 
     const monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
 
-    const currentDate = new Date()
-    const firstDayOfMonth = new Date()
-    firstDayOfMonth.setDate(1)
+    const currentDateSelected = useMemo(() => {
+        const currentDate = new Date()
+
+        if (currentDate.getMonth() === currentMonthIndex)
+            return currentDate
+
+        return new Date(currentDate.getFullYear(), currentMonthIndex+1, 0);
+
+    }, [currentMonthIndex])
+
+
+    const currentDateFirstDay = useMemo(() => {
+        return new Date(currentDateSelected.getFullYear(), currentMonthIndex, 1)
+    }, [currentDateSelected])
+
 
     const formatDate = (date: Date) => {
         let monthNum = date.getMonth()
@@ -29,7 +41,7 @@ const TopPartExpenses : React.FC<{totalExpenses: number}> = ({totalExpenses}) =>
                     Expenses
                 </Text>
                 <Text className='font-plight text-sm text-subtitle'>
-                    {formatDate(firstDayOfMonth)} - {formatDate(currentDate)}
+                    {formatDate(currentDateFirstDay)} - {formatDate(currentDateSelected)}
                 </Text>
             </View>
 

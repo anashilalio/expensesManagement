@@ -47,6 +47,28 @@ const ExpenseDetails: React.FC<ExpenseDetailsProps> = ({ onBack, expense }) => {
     }, {});
   }, user.categories)
 
+  const bgColor = (category: string) => {
+    let degree = 30
+    switch (category) {
+      case "Transport":
+        degree = 50
+        break;
+      case "Food":
+        degree = 45
+        break;
+      case "Shopping":
+        degree = 29
+        break;
+      case "Entertainment":
+        degree = 50
+        break;
+      default:
+        break;
+    }
+
+    return tinycolor(categoriesColors[category]).lighten(degree).toString();
+  }
+
   const [isEditing, setIsEditing] = useState(false)
 
   const [updatedExpense, setUpdatedExpense] = useState<UpdateExpenseType>({
@@ -210,7 +232,7 @@ const ExpenseDetails: React.FC<ExpenseDetailsProps> = ({ onBack, expense }) => {
         <View className="items-center mb-6">
           <View
             className="p-4 rounded-full mb-4"
-            style={{ backgroundColor: `${tinycolor(categoriesColors[expense.category]).lighten(30).toString()}` }}
+            style={{ backgroundColor: `${bgColor(expense.category)}` }}
           >
             {IconComponent ? (
               <IconComponent size={iconSize} />

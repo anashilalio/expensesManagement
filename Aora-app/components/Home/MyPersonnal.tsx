@@ -51,15 +51,13 @@ const MyPersonnal: React.FC<MyPersonnalProps> = ({ currentMonthIndex }) => {
       ...user,
       categories: updatedCategories
     })
-    console.log("effect :");
-    console.log(user.categories);
     
   }, [filteredExpenses])
 
   return (
     <View className='flex-1 gap-6'>
       <View className='w-full border-4 border-gray-50 rounded-3xl flex-col mt-6 p-6 gap-6'>
-        <TopPartExpenses totalExpenses={totalExpensesForMonth} />
+        <TopPartExpenses totalExpenses={totalExpensesForMonth} currentMonthIndex={currentMonthIndex} />
         <LowPartExpenses totalExpenses={totalExpensesForMonth} categories={user.categories} />
       </View>
       <RecentExpenses expenses={monthRecentExpenses} categories={user.categories} />
