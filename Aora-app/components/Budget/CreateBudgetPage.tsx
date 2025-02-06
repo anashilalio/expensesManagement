@@ -8,7 +8,8 @@ import { BudgetType, CommunityBudgetType } from '@/types/types';
 import { formatISO } from 'date-fns';
 import { addCommunityBudgetToDB, addPersonalBudgetToDB } from '@/api/budget';
 import Toast from 'react-native-toast-message';
-
+import Icon from 'react-native-vector-icons/MaterialIcons'
+import Icons from 'react-native-vector-icons/MaterialCommunityIcons'
 type CreateBudgetPageProps = {
   onBack: () => void;
 };
@@ -188,15 +189,13 @@ const CreateBudgetPage: React.FC<CreateBudgetPageProps> = ({ onBack }) => {
   return (
     <View className="flex-1 bg-violet">
 
-      <View className="flex-row items-center justify-between pt-10 px-5 h-24 w-full">
-        <TouchableOpacity onPress={onBack}>
-          <Text className="text-white text-3xl font-bold ">&lt;</Text>
-        </TouchableOpacity>
-        <Text className="text-white text-xl font-bold text-center">Create Budget</Text>
-        <View>
-          <Text style={{display: "none"}}>&lt;</Text>
-        </View>
-      </View>
+      <View className="w-full flex-row justify-between items-center mb-5 mt-10 mx-1 ">
+              <TouchableOpacity onPress={onBack} className="p-3 bg-white rounded-full shadow-md">
+                <Icon name="arrow-back" size={24} color="#4b5563" />
+              </TouchableOpacity>
+              <Text className="text-center text-white text-xl font-bold">Create Budget</Text>
+              <Text></Text>
+            </View>
 
       <View className="flex-1 justify-center items-center mt-12 mb-8">
         <Text className="text-white text-base">How much do you want to spend?</Text>

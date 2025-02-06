@@ -79,7 +79,6 @@ const ExpenseDetails: React.FC<ExpenseDetailsProps> = ({ onBack, expense }) => {
 
   const updateExpenseInUserState = (newExpense: any) => {
 
-    // update list of expenses
     const updatedExpenses = user.expenses.map((exp: any) => {
       if (exp._id === newExpense._id) {
         return newExpense

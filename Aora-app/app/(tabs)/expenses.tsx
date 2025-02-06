@@ -18,6 +18,7 @@ interface ExpenseType {
 
 const Expenses = () => {
   const { user } = useAuth()
+  const[isCommunity , setIsCommunity ] = useState(false);
   const [selectedExpense, setSelectedExpense] = useState<ExpenseType | null>(null)
   const [showFilterOptions, setShowFilterOptions] = useState(false)
   const [sortOption, setSortOption] = useState<string | null>(null)
@@ -140,6 +141,13 @@ const Expenses = () => {
               <Text className="text-gray-700">
                 Date {sortOption?.includes('date') ? (sortOption === 'date-desc' ? '(Descending)' : '(Ascending)') : '(Descending)'}
               </Text>
+            </TouchableOpacity>
+            <TouchableOpacity className='text-gray-700' onPress={()=>setIsCommunity(e=>!e)}>
+              {isCommunity ?  <Text>Personnal</Text> : 
+              
+              <Text>Community</Text>
+              }
+             
             </TouchableOpacity>
           </View>
         )}
