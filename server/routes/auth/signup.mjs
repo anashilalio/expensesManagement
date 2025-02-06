@@ -24,7 +24,12 @@ router.post(
 
         try {
             const savedUser = await newUser.save()
-            return response.sendStatus(201)
+            request.login(savedUser, (err) => {
+                if (err) {
+                    return next(err);
+                }
+                return response.sendStatus(201);
+            }); 
         } catch (error) {
             console.dir(error)
             return response.sendStatus(400)

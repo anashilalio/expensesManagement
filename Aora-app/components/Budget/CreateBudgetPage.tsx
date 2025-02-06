@@ -87,12 +87,10 @@ const CreateBudgetPage: React.FC<CreateBudgetPageProps> = ({ onBack }) => {
     setCategories([...personalCategories, ...communitiesCategories])
   }, [personalCategories, communitiesCategories])
 
-  const [budget, setBudget] = useState<CommunityBudgetType>({
+  const [budget, setBudget] = useState<any>({
     communityCode: '',
     category: '',
     maxAmount: 0,
-    currentAmount: 0,
-    date: ''
   })
 
   const [receiveAlert, setReceiveAlert] = useState(false);
@@ -106,18 +104,26 @@ const CreateBudgetPage: React.FC<CreateBudgetPageProps> = ({ onBack }) => {
   );
 
   const getTotalOfCategory = () => {
-    console.log(user.categories);
-    console.log(budget);
-
+    
     if (budget.communityCode === '') {
       return user.categories.find((category: any) => category.name === budget.category).total
     } else {
       return user.communitiesCategories.find((category: any) =>
-        category.name === budget.category && category.communityCode === budget.communityCode).total
+        category.name === budget.category && category.communityCode === budget.communityCode).currentMonthtotal
     }
   }
 
   const addBudget = async () => {
+
+    if(budget.maxAmount === 0){
+      Toast.show({
+        type: "error",
+        text1: "Error creating budget",
+        text2: "Budget should be greater than 0 !",
+        position: "top",
+      });
+      return
+    }
 
     let date = formatISO(new Date())
     const currentAmount = getTotalOfCategory()
@@ -145,23 +151,31 @@ const CreateBudgetPage: React.FC<CreateBudgetPageProps> = ({ onBack }) => {
         Toast.show({
           type: "success",
           text1: "Budget Created",
-          text2: "Budget for" + budget.category + " was created successfully!",
+          text2: "Budget for " + budget.category + " was created successfully!",
           position: "top",
         });
       } else {
         Toast.show({
           type: "error",
           text1: "Error creating budget",
-          text2: "Error creating budget for" + budget.category,
+          text2: "Error creating budget for " + budget.category,
           position: "top",
         });
       }
       onBack()
     } else {
 
-      const newBudget = await addCommunityBudgetToDB(budget)
+      const communityBudget: CommunityBudgetType = {
+        communityCode: budget.communityCode,
+        category: budget.category,
+        maxAmount: budget.maxAmount,
+        currentAmount: getTotalOfCategory(),
+        date: date
+      }
+
+      const newBudget = await addCommunityBudgetToDB(communityBudget)
       if (newBudget) {
-        const updatedBudgets = [newBudget, ...user.communitiesBudgets];
+        const updatedBudgets = [...user.communitiesBudgets, newBudget];
         setUser({
           ...user,
           communitiesBudgets: updatedBudgets,
@@ -170,7 +184,7 @@ const CreateBudgetPage: React.FC<CreateBudgetPageProps> = ({ onBack }) => {
         Toast.show({
           type: "success",
           text1: "Budget Created",
-          text2: "Budget for" + budget.category + " was created successfully!",
+          text2: "Budget for " + budget.category + " was created successfully!",
           position: "top",
         });
 
@@ -178,7 +192,7 @@ const CreateBudgetPage: React.FC<CreateBudgetPageProps> = ({ onBack }) => {
         Toast.show({
           type: "error",
           text1: "Error creating budget",
-          text2: "Error creating budget for" + budget.category,
+          text2: "Error creating budget for " + budget.category,
           position: "top",
         });
       }

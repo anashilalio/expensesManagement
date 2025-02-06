@@ -1,4 +1,5 @@
 import { Router } from 'express'
+import { User } from '../schemas/user.js'
 import { Expense } from '../schemas/expense.js'
 import { Budget } from '../schemas/budget.js'
 import { Category } from '../schemas/category.js'
@@ -18,6 +19,7 @@ router.get(
 
         const userId = request.session.passport.user
 
+        const user = await User.findById(userId)
         const expenses = await Expense.find({ userId: userId })
         const categories = await Category.find({ userId: { $in: [userId, null] } })
         const budgets = await Budget.find({ userId: userId })
@@ -34,6 +36,7 @@ router.get(
         const communitiesBudgets= await CommunityBudget.find({ communityCode: { $in: communitiescodes } })
 
         const data = JSON.stringify({
+            user: user,
             categories: categories,
             budgets: budgets,
             expenses: expenses,

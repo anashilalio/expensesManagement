@@ -26,7 +26,6 @@ export const updateAmountPersonalBudgetInDB =async (category: string, amount: nu
     const URL = baseUrl + 'api/budget/appendToCurrent'
     try {
         const response = await axios.patch(URL, {category, amount})
-        console.log(response.status);
         
         return (response.status === 200 ? response.data : null)
     } catch (error) {
@@ -46,10 +45,41 @@ export const updateMaxPersonalBudgetInDB =async (category: string, max: number) 
     }
 }
 
+export const updateAmountCommunityBudgetInDB =async (category: string, amount: number, communityCode: string) => {    
+    const URL = baseUrl + 'api/community/budget/appendToCurrent'
+    try {
+        const response = await axios.patch(URL, {category, amount, communityCode})
+        
+        return (response.status === 200 ? response.data : null)
+    } catch (error) {
+        return false
+    }
+}
+
+export const updateMaxCommunityBudgetInDB =async (category: string, max: number, communityCode: string) => {    
+    const URL = baseUrl + 'api/community/budget/updateMax'
+    try {
+        const response = await axios.patch(URL, {category, amount: max, communityCode})
+        return (response.status === 200 ? response.data : null)
+    } catch (error) {
+        return false
+    }
+}
+
 export const deletePersonalBudgetFromDB = async (category: string) => {
     const URL = baseUrl + 'api/budget/delete'
     try {
         const response = await axios.delete(URL, { data: { category } });
+        return (response.status === 200 ? true : false)
+    } catch (error) {
+        return false
+    }
+}
+
+export const deleteCommunityBudgetFromDB = async (category: string, communityCode: string) => {
+    const URL = baseUrl + 'api/community/budget/delete'
+    try {
+        const response = await axios.delete(URL, { data: { category, communityCode } });
         return (response.status === 200 ? true : false)
     } catch (error) {
         return false

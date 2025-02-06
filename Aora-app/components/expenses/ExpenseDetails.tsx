@@ -214,8 +214,8 @@ const ExpenseDetails: React.FC<ExpenseDetailsProps> = ({ onBack, expense }) => {
   }
 
   return (
-    <SafeAreaView className="flex-1 bg-gray-50 px-6">
-      <View className="flex-row items-center justify-between mb-8">
+    <SafeAreaView className="flex-1 bg-white px-6">
+      <View className="flex-row items-center justify-between my-8">
         <TouchableOpacity
           onPress={onBack}
           className="p-2 bg-white rounded-full shadow-sm"

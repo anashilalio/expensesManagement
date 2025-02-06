@@ -110,8 +110,8 @@ const MyCommunities: React.FC<MyCommunitiesProps> = ({ currentMonthIndex }) => {
 
   if (user.communities.length === 0) {
     return (
-      <View>
-        <Text>Join a Community</Text>
+      <View className='flex-col gap-4 mt-4'>
+        <Text className='font-plight text-lg text-gray-400 text-center mt-8'>No Communities</Text>
       </View>
     );
   }

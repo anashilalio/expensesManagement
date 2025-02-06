@@ -192,7 +192,55 @@ export const updateAmountBudgetValidationSchema = {
         }
     }
 }
+export const updateCommunityAmountBudgetValidationSchema = {
+    communityCode: {
+        notEmpty: {
+            errorMessage: 'communityCode is empty!'
+        },
+        isString: {
+            errorMessage: 'communityCode must be a string!'
+        }
+    },
+    category: {
+        notEmpty: {
+            errorMessage: 'Category is empty!'
+        },
+        isString: {
+            errorMessage: 'Category must be a string!'
+        }
+    },
+    amount: {
+        notEmpty: {
+            errorMessage: 'Amount is empty!'
+        }, 
+        custom: {
+            options: (value) => {
+                if(typeof value === 'number' && !isNaN(value))
+                    return true
+                throw new Error("Amount must be a number");
+            }
+        }
+    }
+}
 export const deleteBudgetValidationSchema = {
+    category: {
+        notEmpty: {
+            errorMessage: 'Category is empty!'
+        },
+        isString: {
+            errorMessage: 'Category must be a string!'
+        }
+    }
+}
+export const deleteCommunityBudgetValidationSchema = {
+    communityCode: {
+        notEmpty: {
+            errorMessage: 'communityCode is empty!'
+        },
+        isString: {
+            errorMessage: 'communityCode must be a string!'
+        }
+    },
     category: {
         notEmpty: {
             errorMessage: 'Category is empty!'
@@ -238,6 +286,16 @@ export const CommunityValidationSchema = {
         },
         isString: {
             errorMessage: 'Name must be a string!'
+        }
+    }
+}
+export const addMemberToCommunityValidationSchema = {
+    communityCode: {
+        notEmpty: {
+            errorMessage: 'communityCode is empty!'
+        },
+        isString: {
+            errorMessage: 'communityCode must be a string!'
         }
     }
 }

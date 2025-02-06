@@ -23,15 +23,24 @@ const Budgets = () => {
 
     const budgets = [...user.budgets, ...user.communitiesBudgets]
 
-    return budgets.map((budget: any, index: number) => (
-      <TouchableOpacity key={index} onPress={() => setSelectedBudget(budget)}>
+    return budgets.map((budget: any, index: number) => {
+      let color = ''
+
+      if(budget.communityCode){
+        color = user.communitiesCategories.find((category: any) => 
+          category.communityCode === budget.communityCode && category.name === budget.category).color
+      }else{
+        color = user.categories.find((category: any) => category.name === budget.category).color
+      }
+      return (<TouchableOpacity key={index} onPress={() => setSelectedBudget(budget)}>
         <ItemBudget
           category={budget.category}
           current={budget.currentAmount}
           max={budget.maxAmount}
+          color={color}
         />
-      </TouchableOpacity>
-    ));
+      </TouchableOpacity>)
+    });
   }, [user.budgets, user.communitiesBudgets]);
 
   let content;

@@ -16,6 +16,8 @@ const MyPersonnal: React.FC<MyPersonnalProps> = ({ currentMonthIndex }) => {
   const { user, setUser } = useAuth()
 
   const filteredExpenses = useMemo(() => {
+    console.log(user);
+    
     return user.expenses.filter((expense: any) => {
       const expenseMonth = new Date(expense.date).getMonth()
       return expenseMonth === currentMonthIndex

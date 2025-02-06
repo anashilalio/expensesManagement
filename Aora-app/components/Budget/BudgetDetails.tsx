@@ -1,9 +1,9 @@
-import { Text, TouchableOpacity, View, TextInput } from 'react-native'
+import { Text, TouchableOpacity, View, TextInput, StyleSheet } from 'react-native'
 import React, { useState } from 'react'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import Icon from 'react-native-vector-icons/MaterialIcons'
 import Icons from 'react-native-vector-icons/MaterialCommunityIcons'
-import { deletePersonalBudgetFromDB, updateMaxPersonalBudgetInDB } from '@/api/budget'
+import { deleteCommunityBudgetFromDB, deletePersonalBudgetFromDB, updateMaxCommunityBudgetInDB, updateMaxPersonalBudgetInDB } from '@/api/budget'
 import Toast from 'react-native-toast-message'
 import { useAuth } from '../AuthContext'
 
@@ -20,62 +20,126 @@ const BudgetDetails: React.FC<BudgetDetailsProps> = ({ budget, onBack }) => {
   const [maxAmount, setMaxAmount] = useState(budget?.maxAmount || 0);
 
   const progress = budget ? (budget.currentAmount / maxAmount) * 100 : 0;
+  const isGlowing = progress > 100;
+console.log(isGlowing);
 
   const deleteBudget = async () => {
-    const deleted = await deletePersonalBudgetFromDB(budget.category)
-    if (deleted) {
-      const updatedBudgets = user.budgets.filter((personalBudget: any) => budget._id !== personalBudget._id)
-      setUser({
-        ...user,
-        budgets: updatedBudgets
-      })
-      Toast.show({
-        type: "success",
-        text1: "Budget deleted",
-        text2: "budget of " + budget.category + " was deleted successfully!",
-        position: "top",
-      });
+
+    if (budget.communityCode) {
+
+      const deleted = await deleteCommunityBudgetFromDB(budget.category, budget.communityCode)
+      if (deleted) {
+        const updatedBudgets = user.communitiesBudgets.filter(
+          (communityBudget: any) => budget._id !== communityBudget._id
+        )
+        setUser({
+          ...user,
+          communitiesBudgets: [...updatedBudgets]
+        })
+        Toast.show({
+          type: "success",
+          text1: "Budget deleted",
+          text2: "budget of " + budget.category + " was deleted successfully!",
+          position: "top",
+        });
+      } else {
+        Toast.show({
+          type: "error",
+          text1: "Error deleting budget",
+          text2: "Error deleting budget of " + budget.category,
+          position: "top",
+        });
+      }
     } else {
-      Toast.show({
-        type: "error",
-        text1: "Error deleting budget",
-        text2: "Error deleting budget of " + budget.category,
-        position: "top",
-      });
+      const deleted = await deletePersonalBudgetFromDB(budget.category)
+      if (deleted) {
+        const updatedBudgets = user.budgets.filter((personalBudget: any) => budget._id !== personalBudget._id)
+        setUser({
+          ...user,
+          budgets: updatedBudgets
+        })
+        Toast.show({
+          type: "success",
+          text1: "Budget deleted",
+          text2: "budget of " + budget.category + " was deleted successfully!",
+          position: "top",
+        });
+      } else {
+        Toast.show({
+          type: "error",
+          text1: "Error deleting budget",
+          text2: "Error deleting budget of " + budget.category,
+          position: "top",
+        });
+      }
     }
     onBack()
   }
 
   const updateBudget = async () => {
 
-    const updated = await updateMaxPersonalBudgetInDB(budget.category, maxAmount)
+    if (budget.communityCode) {
+      const updated = await updateMaxCommunityBudgetInDB(budget.category, maxAmount, budget.communityCode)
 
-    if (updated) {
-      const updatedBudgets = user.budgets.map((personalBudget: any) => {
-        if (personalBudget.category === budget.category) {
-          personalBudget.maxAmount = maxAmount
-        }
-        return personalBudget
-      })
-      setUser({
-        ...user,
-        budgets: updatedBudgets
-      })
-      Toast.show({
-        type: "success",
-        text1: "Budget updated",
-        text2: "budget of " + budget.category + " was updated successfully!",
-        position: "top",
-      });
+      if (updated) {
+        const updatedBudgets = user.communitiesBudgets.map((communityBudget: any) => {
+          if (communityBudget.category === budget.category) {
+            communityBudget.maxAmount = maxAmount
+          }
+          return communityBudget
+        })
+        setUser({
+          ...user,
+          communitiesBudgets: updatedBudgets
+        })
+        Toast.show({
+          type: "success",
+          text1: "Budget updated",
+          text2: "budget of " + budget.category + " was updated successfully!",
+          position: "top",
+        });
+      } else {
+        Toast.show({
+          type: "error",
+          text1: "Error updating budget",
+          text2: "Error updating budget of " + budget.category,
+          position: "top",
+        });
+      }
+
     } else {
-      Toast.show({
-        type: "error",
-        text1: "Error updating budget",
-        text2: "Error updating budget of " + budget.category,
-        position: "top",
-      });
+
+      const updated = await updateMaxPersonalBudgetInDB(budget.category, maxAmount)
+
+      if (updated) {
+        const updatedBudgets = user.budgets.map((personalBudget: any) => {
+          if (personalBudget.category === budget.category) {
+            personalBudget.maxAmount = maxAmount
+          }
+          return personalBudget
+        })
+        setUser({
+          ...user,
+          budgets: updatedBudgets
+        })
+        Toast.show({
+          type: "success",
+          text1: "Budget updated",
+          text2: "budget of " + budget.category + " was updated successfully!",
+          position: "top",
+        });
+      } else {
+        Toast.show({
+          type: "error",
+          text1: "Error updating budget",
+          text2: "Error updating budget of " + budget.category,
+          position: "top",
+        });
+      }
+
     }
     onBack()
+
   }
 
   return (
@@ -97,8 +161,16 @@ const BudgetDetails: React.FC<BudgetDetailsProps> = ({ budget, onBack }) => {
       <Text className="text-lg text-gray-500 font-medium">Remaining</Text>
       <Text className="text-5xl font-bold my-3">${budget?.currentAmount}</Text>
 
-      <View className="w-full h-2 bg-gray-200 rounded-full my-4">
-        <View style={{ width: `${progress}%` }} className="h-full bg-yellow-500 rounded-full" />
+      <View
+        className="w-full h-2 bg-gray-200 rounded-full my-4"
+      >
+        <View
+          style={[
+            { width: `${Math.min(progress, 100)}%` },
+            isGlowing && styles.glowEffect
+          ]}
+          className="h-full bg-yellow-500 rounded-full"
+        />
       </View>
 
       {isEditing ? (
@@ -134,3 +206,14 @@ const BudgetDetails: React.FC<BudgetDetailsProps> = ({ budget, onBack }) => {
 }
 
 export default BudgetDetails
+
+const styles = StyleSheet.create({
+  glowEffect: {
+    backgroundColor: '#FF0000',
+    shadowColor: '#FF0000', // Red glow
+    shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 0.9,
+    shadowRadius: 10,
+    elevation: 10, // For Android shadow
+  },
+});

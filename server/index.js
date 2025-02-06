@@ -1,6 +1,7 @@
 import express from "express";
 import mongoose from "mongoose";
 import loginRouter from "./routes/auth/login.mjs"
+import logoutRouter from "./routes/auth/logout.mjs"
 import signUpRouter from "./routes/auth/signup.mjs"
 import expenseRouter from "./routes/expense.mjs"
 import budgetRouter from "./routes/budget.mjs"
@@ -39,8 +40,8 @@ app.use(passport.session())
 
 // routes
 app.use(
-  signUpRouter, loginRouter, expenseRouter, budgetRouter, categoryRouter, userRouter, communityRouter,
-  communityCategoryRouter, communityExpenseRouter, communityBudgetRouter
+  signUpRouter, loginRouter, logoutRouter, expenseRouter, budgetRouter, categoryRouter, userRouter,
+  communityRouter, communityCategoryRouter, communityExpenseRouter, communityBudgetRouter
 )
 
 // Set port

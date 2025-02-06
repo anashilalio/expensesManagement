@@ -8,14 +8,43 @@ import {
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 import AddCommunity from './AddCommunity';
 import Icon from 'react-native-vector-icons/MaterialIcons'
-import Icons from 'react-native-vector-icons/MaterialCommunityIcons'
+import { addMemberToDB } from '@/api/community';
+import Toast from 'react-native-toast-message';
+import { router } from 'expo-router';
+import { useAuth } from '../AuthContext';
+
 interface CommunityProps {
   onBack: () => void;
 }
 
 const Community: React.FC<CommunityProps> = ({ onBack }) => {
+
   const [communityCode, setCommunityCode] = useState('');
   const [createCommunity, setCreateCommunity] = useState(false);
+
+  const joinCommunity = async () => {
+
+    const {joined, communityName} = await addMemberToDB(communityCode)
+
+    if (joined) {
+      Toast.show({
+        type: "success",
+        text1: "Joined community",
+        text2: "You joined "+communityName+" community!",
+        position: "top",
+      });
+      router.push("/(tabs)/home")
+    } else {
+      Toast.show({
+        type: "error",
+        text1: "Error joining community",
+        text2: "Error joining community",
+        position: "top",
+      });
+    }
+
+  }
+
   if (createCommunity) {
     return <AddCommunity onBack={() => setCreateCommunity(false)} />
   }
@@ -23,9 +52,9 @@ const Community: React.FC<CommunityProps> = ({ onBack }) => {
     <SafeAreaProvider>
       <SafeAreaView className="flex-1 bg-gray-50 px-4 py-4">
         <View className="w-full flex-row justify-between items-center mb-5">
-                <TouchableOpacity onPress={onBack} className="p-3 bg-white rounded-full shadow-md">
-                  <Icon name="arrow-back" size={24} color="#4b5563" />
-                </TouchableOpacity>
+          <TouchableOpacity onPress={onBack} className="p-3 bg-white rounded-full shadow-md">
+            <Icon name="arrow-back" size={24} color="#4b5563" />
+          </TouchableOpacity>
           <Text className="flex-1 text-center text-xl font-semibold text-gray-900">
             Community
           </Text>
@@ -44,7 +73,10 @@ const Community: React.FC<CommunityProps> = ({ onBack }) => {
               value={communityCode}
               onChangeText={setCommunityCode}
             />
-            <TouchableOpacity className="h-12 px-4 bg-violet rounded-lg flex items-center justify-center">
+            <TouchableOpacity
+              className="h-12 px-4 bg-violet rounded-lg flex items-center justify-center"
+              onPress={() => joinCommunity()}
+            >
               <Text className="text-white font-semibold">Join</Text>
             </TouchableOpacity>
           </View>

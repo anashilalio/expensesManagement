@@ -1,20 +1,43 @@
-import { StyleSheet, Text, View } from 'react-native'
-import React, { useEffect, useMemo } from 'react'
+import { Animated, StyleSheet, Text, View } from 'react-native'
+import React, { useEffect, useMemo, useRef, useState } from 'react'
 import { categoryIcons } from '@/utils/IconMapping';
 import { useAuth } from '../AuthContext';
 import tinycolor from 'tinycolor2';
 
-const itemBudget = ({ category, current, max }) => {
-  const remaining = max - current;
+const itemBudget = ({ category, current, max, color }) => {
+
+  const glowAnim = useRef(new Animated.Value(0)).current;
+
+  useEffect(() => {
+    Animated.loop(
+      Animated.sequence([
+        Animated.timing(glowAnim, {
+          toValue: 1,
+          duration: 1000,
+          useNativeDriver: false, // Shadow properties can't use native driver
+        }),
+        Animated.timing(glowAnim, {
+          toValue: 0,
+          duration: 1000,
+          useNativeDriver: false,
+        }),
+      ])
+    ).start();
+  }, [glowAnim]);
+
+  const shadowInterpolation = glowAnim.interpolate({
+    inputRange: [0, 1],
+    outputRange: [2, 10], // Shadow radius grows and shrinks
+  });
+
+  const [barWidth, setBarWidth] = useState(0);
+
   const percentageSpent = current / max * 100;
-  const Icon = categoryIcons[category] || categoryIcons["default"]
+
+  const categoryIconName = categoryIcons[category] ? category : "default"
+  const Icon = categoryIcons[categoryIconName]
 
   const { user } = useAuth()
-
-  const color = useMemo(() => {
-    const arr = [...user.categories, ...user.communitiesCategories]
-    return arr.find((categ) => categ.name === category).color
-  }, [category])
 
   const backgroundColor = useMemo(() => {
     let degree = 30
@@ -43,29 +66,60 @@ const itemBudget = ({ category, current, max }) => {
     <View className='shadow-lg rounded-xl w-full px-5 py-3' style={{ backgroundColor }}>
 
       <View className='flex-row items-center'>
-        <Icon size={30} />
+        {
+          categoryIconName === "default"
+            ? <Icon size={30} color={color} />
+            : <Icon size={30} />
+        }
         <Text className='font-psemibold'>
           {category}
         </Text>
       </View>
 
 
-      <View className="w-full h-8 bg-gray-200 rounded-full my-2">
+      <View className="w-full h-8 bg-gray-200 rounded-full my-2 flex-row items-center gap-3">
         <View
           className="h-full rounded-full items-end justify-center pr-3"
           style={{
             backgroundColor: color,
-            width: `${percentageSpent}%`
+            width: `${Math.min(percentageSpent, 100)}%`
+          }}
+          onLayout={(event) => {
+            const { width } = event.nativeEvent.layout;
+            setBarWidth(width)
           }}
         >
           <Text
             className='text-white font-psemibold'
-            numberOfLines={1}
-            ellipsizeMode="tail"
           >
-            {percentageSpent > 0 ? percentageSpent.toFixed(2) : ''}%
+            {
+              barWidth >= 60
+                ? (
+                  percentageSpent > 100
+                    ?
+                    <Animated.Text
+                      style={[
+                        styles.glowingText,
+                        {
+                          textShadowRadius: shadowInterpolation,
+                        },
+                      ]}
+                    >
+                      ${percentageSpent.toFixed(2)}%
+                    </Animated.Text>
+                    : 
+                    `${percentageSpent.toFixed(2)}%`
+                )
+                : ''
+            }
           </Text>
         </View>
+        <Text
+          className='font-pbold'
+          style={{ color }}
+        >
+          {barWidth < 60 ? `${percentageSpent.toFixed(2)}%` : ''}
+        </Text>
       </View>
 
       <View
@@ -84,4 +138,11 @@ const itemBudget = ({ category, current, max }) => {
 
 export default itemBudget
 
-const styles = StyleSheet.create({})
+const styles = StyleSheet.create({
+  glowingText: {
+    color: 'red',
+    fontWeight: 'bold',
+    textShadowColor: 'rgba(255, 0, 0, 0.8)',
+    textShadowOffset: { width: 0, height: 0 },
+  },
+});

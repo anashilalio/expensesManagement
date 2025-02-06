@@ -1,6 +1,4 @@
 import { Router } from 'express'
-import { loginCredentialsValidationSchema } from '../../utils/validationSchemas.mjs'
-import { checkSchema } from 'express-validator'
 import passport from 'passport'
 import "../../strategies/local.mjs"
 

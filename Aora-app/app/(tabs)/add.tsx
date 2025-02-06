@@ -8,6 +8,8 @@ import {
   Image,
   ScrollView,
   Modal,
+  Button,
+  Alert,
 } from 'react-native'
 import RNPickerSelect from 'react-native-picker-select'
 import * as ImagePicker from 'expo-image-picker'
@@ -20,14 +22,14 @@ import { defaultCategoriesNum } from '@/utils/constants'
 import { customCategoriesColor } from '@/utils/categoriesColors'
 import { addCommunityExpenseToDB, addPersonalExpenseToDB } from '@/api/expense'
 import Toast from 'react-native-toast-message'
-import { updateAmountPersonalBudgetInDB } from '@/api/budget'
+import { updateAmountCommunityBudgetInDB, updateAmountPersonalBudgetInDB } from '@/api/budget'
+import Ionicons from '@expo/vector-icons/Ionicons';
+//import mime from 'mime'
 
 const Add = () => {
 
   const { user, setUser } = useAuth()
 
-  const [repeatTransaction, setRepeatTransaction] = useState(false)
-  const [selectedWallet, setSelectedWallet] = useState<string | undefined>(undefined)
   const [attachments, setAttachments] = useState<string[]>([])
 
   const [personalCategories, setPersonalCategories] = useState([
@@ -125,73 +127,9 @@ const Add = () => {
   const [newCategoryName, setNewCategoryName] = useState('')
   const [showImageOptionsModal, setShowImageOptionsModal] = useState(false)
 
-  const wallet = [
-    { label: 'Paypal', value: 'Paypal' },
-    { label: 'CIH', value: 'CIH' },
-    { label: 'BqChaabi', value: 'BqChaabi' },
-  ]
-
-  const handleDeleteImage = (index: number) => {
-    setAttachments((prevAttachments) =>
-      prevAttachments.filter((_, i) => i !== index)
-    )
-  }
-
-  const pickFromGallery = async () => {
-    try {
-      setShowImageOptionsModal(false)
-
-      const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync()
-      if (status !== 'granted') {
-        alert('Sorry, we need camera roll permissions to make this work!')
-        return
-      }
-
-      const result = await ImagePicker.launchImageLibraryAsync({
-        mediaTypes: ImagePicker.MediaTypeOptions.Images,
-        allowsMultipleSelection: true,
-        base64: false,
-        quality: 1,
-      })
-
-      if (!result.canceled) {
-        const pickedImages = result.assets.map((asset) => asset.uri)
-        setAttachments((prev) => [...prev, ...pickedImages])
-      }
-    } catch (error) {
-      console.log('Error picking images from gallery:', error)
-    }
-  }
-
-  const takePhoto = async () => {
-    try {
-      setShowImageOptionsModal(false)
-
-      const { status } = await ImagePicker.requestCameraPermissionsAsync()
-      if (status !== 'granted') {
-        alert('Sorry, we need camera permissions to make this work!')
-        return
-      }
-
-      const result = await ImagePicker.launchCameraAsync({
-        base64: false,
-        quality: 1,
-      })
-
-      if (!result.canceled) {
-
-        const newPhotoUri = result.assets[0].uri
-        setAttachments((prev) => [...prev, newPhotoUri])
-      }
-    } catch (error) {
-      console.log('Error taking photo:', error)
-    }
-  }
-
   const addExpense = async () => {
 
     let date = formatISO(new Date())
-    setExpense({ ...expense, date: date })
 
     if (expense.communityCode === '') {
 
@@ -199,8 +137,9 @@ const Add = () => {
         category: expense.category,
         description: expense.description,
         amount: expense.amount,
-        date: expense.date
+        date: date
       }
+      console.log(personalExpense);
 
       const newExpense = await addPersonalExpenseToDB(personalExpense)
 
@@ -219,7 +158,7 @@ const Add = () => {
 
         const updatedBudgets = user.budgets.map((budget: any) => {
           if (budget.category === newExpense.category) {
-            budget.currentAmount += newExpense.amount            
+            budget.currentAmount += newExpense.amount
             updateAmountPersonalBudgetInDB(newExpense.category, budget.currentAmount)
           }
           return budget
@@ -239,7 +178,7 @@ const Add = () => {
           text2: "Expense of " + expense.category + " was created successfully!",
           position: "top",
         });
-      }else{
+      } else {
         Toast.show({
           type: "error",
           text1: "Error adding expense",
@@ -250,7 +189,15 @@ const Add = () => {
 
     } else {
 
-      const newExpense = await addCommunityExpenseToDB(expense)
+      const communityExpense: CommunityExpenseType = {
+        communityCode: expense.communityCode,
+        category: expense.category,
+        description: expense.description,
+        amount: expense.amount,
+        date: date
+      }
+
+      const newExpense = await addCommunityExpenseToDB(communityExpense)
 
       if (newExpense) {
 
@@ -271,8 +218,11 @@ const Add = () => {
         })
 
         const updatedCommunitiesBudgets = user.communitiesBudgets.map((budget: any) => {
-          if (budget.communityCode === newExpense.communityCode &&  budget.category === newExpense.category) {
+
+          if (budget.communityCode === newExpense.communityCode && budget.category === newExpense.category) {
             budget.currentAmount += newExpense.amount
+            updateAmountCommunityBudgetInDB(newExpense.category, budget.currentAmount, newExpense.communityCode)
+
           }
           return budget
         })
@@ -290,7 +240,7 @@ const Add = () => {
           text2: "Expense of " + expense.category + " was created successfully!",
           position: "top",
         });
-      }else{
+      } else {
         Toast.show({
           type: "error",
           text1: "Error adding expense",
@@ -325,7 +275,7 @@ const Add = () => {
           text2: "Category " + newCategoryName + " was created successfully!",
           position: "top",
         });
-      }else{
+      } else {
         Toast.show({
           type: "error",
           text1: "Error creating category",
@@ -338,19 +288,18 @@ const Add = () => {
       const communityCode = user.communities.find((community: any) => community.name === target).code
 
       const index = user.communitiesCategories.reduce((sum: number, category: any) => {
-        if(category.communityCode === communityCode)
+        if (category.communityCode === communityCode)
           return ++sum
         return sum
       }, 0)
-      
+
       const color = customCategoriesColor[index]
 
       const newCategory = await addCommunityCategoryToDB(communityCode, newCategoryName, color)
 
       if (newCategory) {
         newCategory.total = 0
-        console.log("newcatadded");
-        
+
         setUser({
           ...user,
           communitiesCategories: [...user.communitiesCategories, newCategory]
@@ -362,7 +311,7 @@ const Add = () => {
           text2: "Category " + newCategoryName + " was created successfully!",
           position: "top",
         });
-      }else{
+      } else {
         Toast.show({
           type: "error",
           text1: "Error creating category",
@@ -372,6 +321,58 @@ const Add = () => {
       }
     }
   }
+
+  const pickImage = async () => {
+
+    try {
+      const permission = await ImagePicker.requestMediaLibraryPermissionsAsync();
+      if (permission.granted === false) {
+        alert("Permission to access gallery is required!")
+        return
+      }
+
+      const result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ['images'],
+        quality: 1,
+        base64: true
+      })
+
+      if (result.canceled)
+        return undefined
+
+      const image = result.assets[0];
+
+      return image
+
+    } catch (error) {
+      console.error(error);
+    }
+  }
+
+  const processRequest = async (image: ImagePicker.ImagePickerAsset | undefined) => {
+
+    if (image === undefined)
+      return
+
+    try {
+
+      // const mime_type = mime.getType(image.uri)
+      // const base64Image = image.base64
+
+      // const expenseList = await postToGemini(base64Image, mime_type)
+
+    } catch (error) {
+      console.error(error)
+    }
+  }
+
+  const scanImage = async () => {
+
+    const image = await pickImage()
+    // send to gemini
+    const translation = await processRequest(image)
+  }
+
 
   return (
     <SafeAreaView className='h-full w-full bg-white'>
@@ -449,71 +450,6 @@ const Add = () => {
             />
           </View>
 
-          <View className="mb-4">
-            <Text className="text-gray-500 mb-2">Wallet</Text>
-            <RNPickerSelect
-              onValueChange={(value) => setSelectedWallet(value)}
-              items={wallet}
-              placeholder={{
-                label: 'Select a Wallet',
-                value: null,
-                color: '#9CA3AF',
-              }}
-              style={{
-                inputAndroid: {
-                  backgroundColor: '#FFFFFF',
-                  borderRadius: 8,
-                  borderColor: '#E5E7EB',
-                  borderWidth: 1,
-                  padding: 12,
-                  color: '#6B7280',
-                },
-              }}
-            />
-          </View>
-
-          <View className="mb-4">
-            <TouchableOpacity
-              className="border border-dashed border-gray-300 rounded-lg p-4 flex-row justify-center items-center"
-              onPress={() => setShowImageOptionsModal(true)}
-            >
-              <Text className="text-gray-500">📎 Add attachment</Text>
-            </TouchableOpacity>
-          </View>
-
-          {attachments.length > 0 && (
-            <ScrollView
-              horizontal
-              showsHorizontalScrollIndicator={false}
-              className="my-2"
-            >
-              {attachments.map((uri, index) => (
-                <View key={index} className="relative mr-2">
-                  <TouchableOpacity
-                    className="absolute z-10 right-1 top-1 bg-black bg-opacity-50 rounded-full px-1"
-                    onPress={() => handleDeleteImage(index)}
-                  >
-                    <Text className="text-white">X</Text>
-                  </TouchableOpacity>
-                  <Image
-                    source={{ uri }}
-                    className="w-20 h-20 rounded-md"
-                  />
-                </View>
-              ))}
-            </ScrollView>
-          )}
-
-          <View className="flex-row justify-between items-center mt-4">
-            <Text className="text-gray-500">Repeat</Text>
-            <Switch
-              value={repeatTransaction}
-              onValueChange={(value) => setRepeatTransaction(value)}
-              trackColor={{ false: '#767577', true: '#7C3AED' }}
-              thumbColor={repeatTransaction ? '#7C3AED' : '#f4f3f4'}
-            />
-          </View>
-
           <TouchableOpacity
             className="bg-violet p-4 rounded-lg mt-6"
             onPress={() => addExpense()}
@@ -522,6 +458,19 @@ const Add = () => {
               Add expense
             </Text>
           </TouchableOpacity>
+
+          <View>
+            <TouchableOpacity
+              className='flex-row items-center gap-2 bg-cyan-700'
+              onPress={() => scanImage()}
+              activeOpacity={0.6}
+            >
+              <Ionicons name="scan" size={30} color="black" />
+              <Text className='font-pmedium'>Scan receipt</Text>
+            </TouchableOpacity>
+
+          </View>
+
         </View>
       </View>
 
@@ -582,36 +531,6 @@ const Add = () => {
         </View>
       </Modal>
 
-      <Modal
-        transparent
-        animationType="fade"
-        visible={showImageOptionsModal}
-        onRequestClose={() => setShowImageOptionsModal(false)}
-      >
-        <View className="flex-1 justify-center items-center bg-black bg-opacity-50">
-          <View className="w-64 p-6 bg-white rounded-xl">
-            <Text className="text-lg font-semibold text-gray-700 mb-3">Add Attachment</Text>
-
-            <TouchableOpacity
-              className="bg-gray-300 p-3 rounded-md mb-3"
-              onPress={pickFromGallery}
-            >
-              <Text className="text-center text-gray-700">Pick from Gallery</Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity className="bg-gray-300 p-3 rounded-md" onPress={takePhoto}>
-              <Text className="text-center text-gray-700">Take a Photo</Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              className="mt-4 p-2 rounded-md items-center"
-              onPress={() => setShowImageOptionsModal(false)}
-            >
-              <Text className="text-gray-500">Cancel</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-      </Modal>
     </SafeAreaView>
   )
 }

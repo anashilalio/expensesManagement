@@ -41,7 +41,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         data.categories = data.categories.map((category: any) => {
             return {
                 ...category,
-                currentMonthtotal: categoriesTotal[category.name] | 0
+                currentMonthtotal: categoriesTotal[category.name] || 0
             }
         })
         

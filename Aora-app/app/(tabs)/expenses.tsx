@@ -24,7 +24,7 @@ const Expenses = () => {
   const [sortOption, setSortOption] = useState<string | null>(null)
   const [selectedCalendarDate, setSelectedCalendarDate] = useState<string | null>(null)
   const [isDatePickerVisible, setDatePickerVisibility] = useState(false)
-  
+
   const { width } = useWindowDimensions()
 
   const iconSize = width < 400 ? 20 : 24
@@ -62,6 +62,14 @@ const Expenses = () => {
   }, [user.expenses, sortOption, selectedCalendarDate])
 
   const expensesList = useMemo(() => {
+
+    if (sortedExpenses.length === 0) {
+      return (
+        <View className='flex-col gap-4 mt-4'>
+          <Text className='font-plight text-lg text-gray-400 text-center mt-8'>No expenses</Text>
+        </View>)
+    }
+    
     return sortedExpenses.map((expense: ExpenseType, index: number) => (
       <TouchableOpacity
         key={index}
@@ -101,11 +109,11 @@ const Expenses = () => {
   const showDatePicker = () => {
     setDatePickerVisibility(true)
   }
-  
+
   const hideDatePicker = () => {
     setDatePickerVisibility(false)
   }
-  
+
   const handleConfirm = (date: Date) => {
     const formattedDate = date.toISOString().split('T')[0]
     setSelectedCalendarDate(formattedDate)

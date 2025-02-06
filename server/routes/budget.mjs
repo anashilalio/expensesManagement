@@ -1,8 +1,9 @@
 import { response, Router } from 'express'
 import { Budget } from '../schemas/budget.js'
-import { BudgetValidationSchema, updateAmountBudgetValidationSchema, deleteBudgetValidationSchema } from '../utils/validationSchemas.mjs'
+import { BudgetValidationSchema, updateAmountBudgetValidationSchema, deleteBudgetValidationSchema, deleteCommunityBudgetValidationSchema } from '../utils/validationSchemas.mjs'
 import { checkSchema, matchedData, validationResult } from 'express-validator'
 import mongoose from 'mongoose'
+import { CommunityBudget } from '../schemas/communityBudget.js'
 
 const router = Router()
 
@@ -111,14 +112,14 @@ router.delete(
         }
 
         const data = matchedData(request)
-
+        
         const userId = request.session.passport.user
         
         try {
+            
             const budget = await Budget.findOneAndDelete(
                 { userId, category: data.category }
             )
-            
             if(budget){
                 return response.sendStatus(200)
             }else{

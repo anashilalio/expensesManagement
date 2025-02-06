@@ -5,7 +5,7 @@ import tinycolor from 'tinycolor2'
 
 interface DefaultIconProps {
     size: number
-    name: string
+    name?: string
     color: string
 }
 const DefaultIcon: React.FC<DefaultIconProps> = ({ size, name, color }) => {
