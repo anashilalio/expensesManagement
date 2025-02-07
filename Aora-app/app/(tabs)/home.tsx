@@ -21,6 +21,7 @@ const Home = () => {
   const [showCommunity, setShowCommunity] = useState(false)
   const [showMenu, setShowMenu] = useState(false)
   const [currentMonthIndex, setCurrentMonthIndex] = useState(new Date().getMonth())
+  const [currentYear, setCurrentYear] = useState(new Date().getFullYear())  // Track the current year
   const [showNotification, setShowNotification] = useState(false)
   const [isPersonnalVisible, setIsPersonnalVisible] = useState(true)
   const [showProfile, setShowProfile] = useState(false)
@@ -31,11 +32,21 @@ const Home = () => {
   ]
 
   const handleNextMonth = () => {
-    setCurrentMonthIndex((prev) => (prev + 1) % 12)
+    if (currentMonthIndex === 11) {
+      setCurrentMonthIndex(0) // Reset to January
+      setCurrentYear(prev => prev + 1) // Move to next year
+    } else {
+      setCurrentMonthIndex(prev => prev + 1)
+    }
   }
 
   const handlePreviousMonth = () => {
-    setCurrentMonthIndex((prev) => (prev - 1 + 12) % 12)
+    if (currentMonthIndex === 0) {
+      setCurrentMonthIndex(11) // Reset to December
+      setCurrentYear(prev => prev - 1) // Move to previous year
+    } else {
+      setCurrentMonthIndex(prev => prev - 1)
+    }
   }
 
   if (showCommunity) {
@@ -86,7 +97,7 @@ const Home = () => {
                 <TouchableOpacity onPress={handlePreviousMonth}>
                   <FontAwesome6 name="chevron-left" size={18} color="black" />
                 </TouchableOpacity>
-                <Text className="font-semibold mx-2">{months[currentMonthIndex]}</Text>
+                <Text className="font-semibold mx-2">{months[currentMonthIndex]} {currentYear}</Text>
                 <TouchableOpacity onPress={handleNextMonth}>
                   <FontAwesome6 name="chevron-right" size={18} color="black" />
                 </TouchableOpacity>
@@ -128,9 +139,9 @@ const Home = () => {
           </View>
 
           {isPersonnalVisible ? (
-            <MyPersonnal currentMonthIndex={currentMonthIndex} />
+            <MyPersonnal currentMonthIndex={currentMonthIndex} currentYear={currentYear} />
           ) : (
-            <MyCommunities currentMonthIndex={currentMonthIndex} />
+            <MyCommunities currentMonthIndex={currentMonthIndex} currentYear={currentYear} />
           )}
         </View>
       </ScrollView>

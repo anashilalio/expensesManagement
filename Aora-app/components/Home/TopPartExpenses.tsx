@@ -3,7 +3,7 @@ import { Text, View } from "react-native"
 import { CurrencyContext } from "@/app/(tabs)/home"
 import { formatAmount } from "../../utils/format"
 
-const TopPartExpenses: React.FC<{ totalExpenses: number, currentMonthIndex: number }> = ({ totalExpenses, currentMonthIndex }) => {
+const TopPartExpenses: React.FC<{ totalExpenses: number, currentMonthIndex: number, currentYear:number }> = ({ totalExpenses, currentMonthIndex, currentYear }) => {
 
     const { currency } = useContext(CurrencyContext)
 
@@ -15,13 +15,13 @@ const TopPartExpenses: React.FC<{ totalExpenses: number, currentMonthIndex: numb
         if (currentDate.getMonth() === currentMonthIndex)
             return currentDate
 
-        return new Date(currentDate.getFullYear(), currentMonthIndex+1, 0);
+        return new Date(currentYear, currentMonthIndex+1, 0);
 
-    }, [currentMonthIndex])
+    }, [currentMonthIndex, currentYear])
 
 
     const currentDateFirstDay = useMemo(() => {
-        return new Date(currentDateSelected.getFullYear(), currentMonthIndex, 1)
+        return new Date(currentYear, currentMonthIndex, 1)
     }, [currentDateSelected])
 
 

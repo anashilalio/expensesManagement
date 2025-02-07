@@ -30,14 +30,22 @@ const Expenses = () => {
   const iconSize = width < 400 ? 20 : 24
 
   const categoriesColors = useMemo(() => {
+  
+    if(isCommunity){
+      return user.communitiesCategories.reduce((arr: any, category: any) => {
+        arr[category.name] = category.color
+        return arr
+      }, {})
+    }
+
     return user.categories.reduce((arr: any, category: any) => {
       arr[category.name] = category.color
       return arr
     }, {})
-  }, [user.categories])
+  }, [user.categories, isCommunity, user.communitiesCategories])
 
   const sortedExpenses = useMemo(() => {
-    let expensesCopy = [...user.expenses]
+    let expensesCopy = isCommunity ? [...user.communitiesExpenses] : [...user.expenses]
 
     if (selectedCalendarDate) {
       expensesCopy = expensesCopy.filter((expense: ExpenseType) =>
@@ -59,7 +67,7 @@ const Expenses = () => {
       )
     }
     return expensesCopy
-  }, [user.expenses, sortOption, selectedCalendarDate])
+  }, [user.expenses, sortOption, selectedCalendarDate, isCommunity])
 
   const expensesList = useMemo(() => {
 

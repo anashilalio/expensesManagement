@@ -117,6 +117,24 @@ export const UserValidationSchema = {
         }
     }
 }
+export const updateUserValidationSchema = {
+    username: {
+        notEmpty: {
+            errorMessage: 'Category is empty!'
+        },
+        isString: {
+            errorMessage: 'Category must be a string!'
+        }
+    },
+    email: {
+        notEmpty: {
+            errorMessage: 'Name is empty!'
+        },
+        isString: {
+            errorMessage: 'Name must be a string!'
+        }
+    }
+}
 
 export const BudgetValidationSchema = {
     category: {

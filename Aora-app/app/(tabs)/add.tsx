@@ -24,7 +24,9 @@ import { addCommunityExpenseToDB, addPersonalExpenseToDB } from '@/api/expense'
 import Toast from 'react-native-toast-message'
 import { updateAmountCommunityBudgetInDB, updateAmountPersonalBudgetInDB } from '@/api/budget'
 import Ionicons from '@expo/vector-icons/Ionicons';
-//import mime from 'mime'
+import mime from 'mime'
+import { postToGemini } from '@/api/imageScanning'
+
 
 const Add = () => {
 
@@ -349,30 +351,18 @@ const Add = () => {
     }
   }
 
-  const processRequest = async (image: ImagePicker.ImagePickerAsset | undefined) => {
+  const scanReceipt = async () => {
+    
+    try{
+      const image = await pickImage()
+      
+      const text = await postToGemini(image?.base64, image?.mimeType)
+      
+      console.log('image picked')
+    }catch(err){
 
-    if (image === undefined)
-      return
-
-    try {
-
-      // const mime_type = mime.getType(image.uri)
-      // const base64Image = image.base64
-
-      // const expenseList = await postToGemini(base64Image, mime_type)
-
-    } catch (error) {
-      console.error(error)
     }
   }
-
-  const scanImage = async () => {
-
-    const image = await pickImage()
-    // send to gemini
-    const translation = await processRequest(image)
-  }
-
 
   return (
     <SafeAreaView className='h-full w-full bg-white'>
@@ -459,17 +449,16 @@ const Add = () => {
             </Text>
           </TouchableOpacity>
 
-          <View>
+          {/*<View>
             <TouchableOpacity
               className='flex-row items-center gap-2 bg-cyan-700'
-              onPress={() => scanImage()}
+              onPress={() => scanReceipt()}
               activeOpacity={0.6}
             >
               <Ionicons name="scan" size={30} color="black" />
               <Text className='font-pmedium'>Scan receipt</Text>
             </TouchableOpacity>
-
-          </View>
+          </View>*/}
 
         </View>
       </View>

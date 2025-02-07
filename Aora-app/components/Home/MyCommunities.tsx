@@ -14,8 +14,9 @@ interface CurrentCommunityType {
 }
 interface MyCommunitiesProps {
   currentMonthIndex: number;
+  currentYear: number
 }
-const MyCommunities: React.FC<MyCommunitiesProps> = ({ currentMonthIndex }) => {
+const MyCommunities: React.FC<MyCommunitiesProps> = ({ currentMonthIndex, currentYear }) => {
 
   const { user } = useAuth();
 
@@ -57,13 +58,14 @@ const MyCommunities: React.FC<MyCommunitiesProps> = ({ currentMonthIndex }) => {
     if (!currentCommunity?.code) return [];
     const arr = user.communitiesExpenses.filter((expense: any) =>
       expense.communityCode === currentCommunity.code &&
-      new Date(expense.date).getMonth() === currentMonthIndex
+      new Date(expense.date).getMonth() === currentMonthIndex &&
+      new Date(expense.date).getFullYear() === currentYear
     );
     console.log("filteredCommunityExpenses");
     console.log(arr);
 
     return arr
-  }, [user.communitiesExpenses, currentCommunity, currentMonthIndex]);
+  }, [user.communitiesExpenses, currentCommunity, currentMonthIndex, currentYear]);
 
   const totalCommunityExpensesForMonth = useMemo(() => {
     const tot = filteredCommunityExpenses.reduce((sum: number, expense: any) => sum + expense.amount, 0);
@@ -140,7 +142,7 @@ const MyCommunities: React.FC<MyCommunitiesProps> = ({ currentMonthIndex }) => {
         />
       </View>
       <View className="w-full border-4 border-gray-50 rounded-3xl flex-col p-6 gap-6">
-        <TopPartExpenses totalExpenses={totalCommunityExpensesForMonth} currentMonthIndex={currentMonthIndex} />
+        <TopPartExpenses totalExpenses={totalCommunityExpensesForMonth} currentMonthIndex={currentMonthIndex} currentYear={currentYear}  />
         <LowPartExpenses totalExpenses={totalCommunityExpensesForMonth} categories={communityCategories} />
       </View>
       <RecentExpenses expenses={monthRecentExpenses} categories={currentCommunityCategories} />

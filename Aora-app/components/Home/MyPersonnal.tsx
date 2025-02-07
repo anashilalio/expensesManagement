@@ -9,20 +9,20 @@ import { numberOfRecentExpenses } from '@/utils/constants'
 
 interface MyPersonnalProps {
   currentMonthIndex: number
+  currentYear: number
 }
 
-const MyPersonnal: React.FC<MyPersonnalProps> = ({ currentMonthIndex }) => {
+const MyPersonnal: React.FC<MyPersonnalProps> = ({ currentMonthIndex, currentYear }) => {
 
   const { user, setUser } = useAuth()
 
   const filteredExpenses = useMemo(() => {
-    console.log(user);
-    
     return user.expenses.filter((expense: any) => {
       const expenseMonth = new Date(expense.date).getMonth()
-      return expenseMonth === currentMonthIndex
+      const expenseYear = new Date(expense.date).getFullYear() 
+      return (expenseMonth === currentMonthIndex && expenseYear === currentYear)
     })
-  }, [user.expenses, currentMonthIndex])
+  }, [user.expenses, currentMonthIndex, currentYear])
 
   const totalExpensesForMonth = useMemo(() => {
     return filteredExpenses.reduce((sum: number, expense: any) => sum + expense.amount, 0)
@@ -59,7 +59,7 @@ const MyPersonnal: React.FC<MyPersonnalProps> = ({ currentMonthIndex }) => {
   return (
     <View className='flex-1 gap-6'>
       <View className='w-full border-4 border-gray-50 rounded-3xl flex-col mt-6 p-6 gap-6'>
-        <TopPartExpenses totalExpenses={totalExpensesForMonth} currentMonthIndex={currentMonthIndex} />
+        <TopPartExpenses totalExpenses={totalExpensesForMonth} currentMonthIndex={currentMonthIndex} currentYear={currentYear} />
         <LowPartExpenses totalExpenses={totalExpensesForMonth} categories={user.categories} />
       </View>
       <RecentExpenses expenses={monthRecentExpenses} categories={user.categories} />

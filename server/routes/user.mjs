@@ -7,6 +7,8 @@ import { Community } from '../schemas/community.js'
 import { CommunityExpense } from '../schemas/communityExpense.js'
 import { CommunityCategory } from '../schemas/communityCategory.js'
 import { CommunityBudget } from '../schemas/communityBudget.js'
+import { updateUserValidationSchema } from '../utils/validationSchemas.mjs'
+import { checkSchema, matchedData, validationResult } from 'express-validator';
 
 const router = Router()
 
@@ -46,6 +48,37 @@ router.get(
             communitiesBudgets
         })
         return response.status(200).send(data)
+    }
+)
+
+router.patch(
+    "/api/user/update",
+    checkSchema(updateUserValidationSchema),
+    async (request, response) => {
+
+        const result = validationResult(request)
+        
+        if (!result.isEmpty()) {
+            return response.status(400).send({ errors: result.array() })
+        }
+
+        const data = matchedData(request)
+        
+        try {
+            const user = await User.findOneAndUpdate(
+                { _id: request.session.passport.user },
+                {email: data.email, username: data.username}
+            )
+            
+            if(user){
+                return response.sendStatus(200)
+            }else{
+                return response.sendStatus(400)
+            }
+        } catch (error) {
+            console.dir(error)
+            return response.sendStatus(400)
+        }
     }
 )
 
